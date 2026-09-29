@@ -1,36 +1,113 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TCHS Automation — The Happy Club Studios
 
-## Getting Started
+A modern, full-stack Proposal and Sales Invoice automation web application built for **The Happy Club Studios (TCHS)** and **The Cliffhanger Studios**. Replaces manual spreadsheet calculations with automated pricing, custom discount configurations, Canva-styled PDF quotation generation, digital staff signature stamps, and cloud database synchronization.
 
-First, run the development server:
+---
 
+## 🚀 Key Features
+
+- **Automated Proposal & Invoice Engine**: Real-time subtotal, dynamic add-on selection, automated invoice numbering (`TCHS-YYYYMMDD-XXXX`), and mobilization fee calculation per location zone.
+- **Dynamic Discounts & Promos**:
+  - Staff can selectively include or exclude discounts for specific clients.
+  - Inline editing of discount names and calculation types (`%` percentage or `₱` fixed amount).
+  - On-the-fly custom discount creation (e.g., *Early Bird Promo*, *Bridal Fair Special*, *Flash Sale*).
+- **Canva-Themed Document Generator**:
+  - Warm craft-paper aesthetic matching Canva templates (Great Vibes cursive calligraphy, Cinzel headers, sunflower accents).
+  - One-click toggle between **Canva Quotation PDF** and **Official Formal Sales Invoice**.
+  - Browser print-ready styling (`window.print()`).
+- **Service Catalog Management (`/catalog`)**:
+  - Centralized master catalog for Service Packages, Categories, Add-ons, and pricing intervals.
+  - Strict separation of concerns: Proposal screen only picks from catalog; permanent catalog edits happen exclusively in `/catalog`.
+- **Role-Based Authentication & Supabase Cloud Sync**:
+  - Secure login with Supabase Auth and `public.profiles`.
+  - **Admin-Only Account Provisioning**: Regular staff cannot register publicly; only users with `role: 'admin'` can create new staff credentials inside `/settings`.
+  - Offline-first fallback to local storage when offline or configuring credentials.
+- **Digital Signatures**:
+  - HTML5 Canvas signature pad allowing staff to draw their signature stamp or upload an image signature.
+  - Automatically stamps generated proposals and invoices with the active staff member's credentials.
+
+---
+
+## 🛠️ Tech Stack
+
+- **Framework**: Next.js 16.3.6 (React 19, Turbopack, App Router)
+- **Styling**: Tailwind CSS v4
+- **Database & Auth**: Supabase Cloud PostgreSQL (Free Tier: $0/month)
+- **Icons**: Lucide React
+- **Language**: TypeScript
+
+---
+
+## 🏁 Getting Started
+
+### 1. Clone the repository
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone git@github.com:kuuz4n/tchs-automation.git
+cd tchs-automation
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Install dependencies
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 3. Configure Environment Variables
+Copy `.env.local.example` to `.env.local`:
+```bash
+cp .env.local.example .env.local
+```
+Fill in your Supabase project credentials:
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 4. Database Schema Setup
+Execute the SQL schema in `supabase/schema.sql` in your Supabase SQL Editor, then optionally run the seed script:
+```bash
+node scripts/seed-cloud.js
+```
 
-## Learn More
+### 5. Run Development Server
+```bash
+npm run dev
+```
+Open [http://localhost:3000](http://localhost:3000) to access the application.
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📂 Project Structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+├── scripts/
+│   └── seed-cloud.js             # Supabase cloud database seeding script
+├── src/
+│   ├── app/
+│   │   ├── catalog/page.tsx      # Master Service Catalog CRUD
+│   │   ├── invoices/page.tsx     # Generated Sales Invoices archive
+│   │   ├── login/page.tsx        # Staff login portal
+│   │   ├── settings/page.tsx     # Admin user provisioning & digital signatures
+│   │   ├── globals.css           # Tailwind v4 configuration & print CSS
+│   │   ├── layout.tsx            # App root layout with AuthGuard & Navbar
+│   │   └── page.tsx              # Proposal & Invoice Calculator
+│   ├── components/
+│   │   ├── auth/AuthGuard.tsx    # Route protection & role enforcement
+│   │   ├── invoice/CanvaDocumentView.tsx  # Dual Canva PDF & Invoice preview
+│   │   └── layout/Navbar.tsx     # App navigation & active session status
+│   ├── lib/
+│   │   ├── auth.ts               # Supabase auth helpers & admin account creation
+│   │   ├── seed-data.ts          # Default packages, add-ons, zones & users
+│   │   ├── storage.ts            # Local + Supabase synchronization engine
+│   │   └── supabase.ts           # Supabase client initializer & URL sanitization
+│   └── types/
+│       └── index.ts              # TypeScript interfaces (Packages, Discounts, Invoices)
+└── supabase/
+    └── schema.sql                # PostgreSQL database schema & RLS rules
+```
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🔒 Security & Roles
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Admin (`admin`)**: Full access to provision staff accounts, manage all employee profiles, update global branding, and edit master service catalog.
+- **Sales Representative (`sales_rep`)**: Can build proposals, customize client discounts, generate invoices, and manage personal profile/signature. Cannot create or edit other staff accounts.
