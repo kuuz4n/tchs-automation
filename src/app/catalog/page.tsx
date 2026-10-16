@@ -418,57 +418,64 @@ export default function CatalogPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-slate-200">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      {/* Editorial Header */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-6 border-b border-[#E5DFD3]">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2.5">
-            <Layers className="w-6 h-6 text-teal-700" />
-            Service & Pricing Catalog
+          <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#8B4A2B]">
+            Master Pricing Database
+          </span>
+          <h1 className="font-editorial text-2xl sm:text-3xl font-semibold text-[#1C1917] mt-1 tracking-tight">
+            Service Catalog &amp; Dropdown Registry
           </h1>
-          <p className="text-sm text-slate-500 mt-1">
-            Configure dynamic services, wedding packages, intervals (hours, pax), and custom add-ons.
+          <p className="text-xs text-[#78716C] mt-1">
+            Manage permanent studio categories, package tiers, add-on variants, mobilization zones,
+            and event occasion dropdowns.
           </p>
         </div>
         <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={() => handleOpenCatModal()}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 text-sm font-medium shadow-xs"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#1C1917] hover:bg-[#8B4A2B] text-[#FAF7F2] text-xs font-medium transition-colors cursor-pointer"
           >
-            <Plus className="w-4 h-4 text-teal-700" />
+            <Plus className="w-3.5 h-3.5" />
             New Service Category
           </button>
         </div>
       </div>
 
-      {/* Main 3-Column Layout: Categories -> Packages -> Addons */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-6">
+      {/* Main 3-Column Master-Detail Layout: Categories -> Packages -> Addons */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Column 1: Service Categories */}
-        <div className="lg:col-span-3 bg-white rounded-xl border border-slate-200 shadow-xs p-4 flex flex-col">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-              1. Service Categories
-            </span>
+        <div className="lg:col-span-3 bg-[#FFFDF9] rounded-xl border border-[#E5DFD3] p-5 flex flex-col">
+          <div className="flex items-baseline justify-between pb-3.5 border-b border-[#EFECE4]">
+            <div className="flex items-baseline gap-2">
+              <span className="font-num text-xs font-semibold text-[#8B4A2B]">01</span>
+              <span className="font-editorial text-base font-semibold text-[#1C1917]">
+                Service Lines
+              </span>
+            </div>
+            <span className="font-num text-[11px] text-[#78716C]">{categories.length}</span>
           </div>
 
-          <div className="space-y-1.5 mt-3 flex-1">
+          <div className="space-y-1.5 mt-3.5 flex-1">
             {categories.map((cat) => (
               <div
                 key={cat.id}
                 onClick={() => setSelectedCategoryId(cat.id)}
-                className={`group flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all ${
+                className={`group flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all border ${
                   cat.id === selectedCategoryId
-                    ? 'bg-teal-700 text-white font-medium shadow-xs'
-                    : 'text-slate-700 hover:bg-slate-100'
+                    ? 'bg-[#1C1917] text-[#FAF7F2] border-[#1C1917]'
+                    : 'bg-[#FAF8F4] text-[#292524] border-transparent hover:border-[#D6CFC2]'
                 }`}
               >
                 <div className="truncate pr-2">
-                  <div className="text-sm font-semibold truncate">{cat.name}</div>
+                  <div className="text-xs font-semibold truncate">{cat.name}</div>
                   {cat.description && (
                     <div
-                      className={`text-[11px] truncate ${
-                        cat.id === selectedCategoryId ? 'text-teal-100' : 'text-slate-400'
+                      className={`text-[11px] truncate mt-0.5 ${
+                        cat.id === selectedCategoryId ? 'text-[#C8B9A6]' : 'text-[#78716C]'
                       }`}
                     >
                       {cat.description}
@@ -476,15 +483,17 @@ export default function CatalogPage() {
                   )}
                 </div>
 
-                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
                   <button
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
                       handleOpenCatModal(cat);
                     }}
-                    className={`p-1 rounded ${
-                      cat.id === selectedCategoryId ? 'hover:bg-teal-600' : 'hover:bg-slate-200'
+                    className={`p-1 rounded cursor-pointer ${
+                      cat.id === selectedCategoryId
+                        ? 'hover:bg-[#2E2925] text-[#C8B9A6]'
+                        : 'hover:bg-[#E5DFD3] text-[#57534E]'
                     }`}
                   >
                     <Edit2 className="w-3.5 h-3.5" />
@@ -495,8 +504,10 @@ export default function CatalogPage() {
                       e.stopPropagation();
                       handleDeleteCategory(cat.id, cat.name);
                     }}
-                    className={`p-1 rounded ${
-                      cat.id === selectedCategoryId ? 'hover:bg-teal-600' : 'hover:bg-slate-200'
+                    className={`p-1 rounded cursor-pointer ${
+                      cat.id === selectedCategoryId
+                        ? 'hover:bg-[#2E2925] text-[#E8C5C3]'
+                        : 'hover:bg-[#FBECEB] text-[#9E3B33]'
                     }`}
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -508,61 +519,69 @@ export default function CatalogPage() {
         </div>
 
         {/* Column 2: Packages under Category */}
-        <div className="lg:col-span-4 bg-white rounded-xl border border-slate-200 shadow-xs p-4 flex flex-col">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-            <div>
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
-                2. Packages under
-              </span>
-              <span className="text-sm font-semibold text-slate-800">
-                {currentCategory?.name || 'Category'}
-              </span>
+        <div className="lg:col-span-4 bg-[#FFFDF9] rounded-xl border border-[#E5DFD3] p-5 flex flex-col">
+          <div className="flex items-center justify-between pb-3.5 border-b border-[#EFECE4]">
+            <div className="flex items-baseline gap-2">
+              <span className="font-num text-xs font-semibold text-[#8B4A2B]">02</span>
+              <div>
+                <span className="font-editorial text-base font-semibold text-[#1C1917] block leading-tight">
+                  {currentCategory?.name || 'Packages'}
+                </span>
+                <span className="text-[11px] text-[#78716C]">Base tiers &amp; Canva inclusions</span>
+              </div>
             </div>
             <button
               type="button"
               onClick={() => handleOpenPkgModal()}
               disabled={!selectedCategoryId}
-              className="flex items-center gap-1 text-xs px-2.5 py-1.5 rounded-lg bg-teal-50 text-teal-700 hover:bg-teal-100 font-medium"
+              className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg bg-[#F5F2EB] text-[#1C1917] hover:bg-[#E7E1D5] border border-[#D6CFC2] font-medium cursor-pointer"
             >
-              <Plus className="w-3.5 h-3.5" />
+              <Plus className="w-3.5 h-3.5 text-[#8B4A2B]" />
               Add Package
             </button>
           </div>
 
-          <div className="space-y-2 mt-3 flex-1">
+          <div className="space-y-2.5 mt-3.5 flex-1">
             {currentPackages.length === 0 ? (
-              <div className="text-center py-8 text-slate-400 text-xs">
-                No packages yet under this category.
+              <div className="text-center py-10 text-[#78716C] text-xs">
+                No packages registered under this category yet.
               </div>
             ) : (
               currentPackages.map((pkg) => (
                 <div
                   key={pkg.id}
                   onClick={() => setSelectedPackageId(pkg.id)}
-                  className={`p-3.5 rounded-xl border transition-all cursor-pointer ${
+                  className={`p-4 rounded-xl border transition-all cursor-pointer ${
                     pkg.id === selectedPackageId
-                      ? 'border-teal-600 bg-teal-50/50 shadow-xs'
-                      : 'border-slate-200 hover:border-slate-300 bg-white'
+                      ? 'border-[#8B4A2B] bg-[#FAF6F0]'
+                      : 'border-[#E5DFD3] hover:border-[#C8B9A6] bg-[#FAF8F4]/60'
                   }`}
                 >
-                  <div className="flex items-start justify-between">
+                  <div className="flex items-start justify-between gap-2">
                     <div>
-                      <h3 className="font-semibold text-slate-900 text-sm">{pkg.name}</h3>
-                      <div className="text-xs font-bold text-teal-700 mt-0.5">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h3 className="font-semibold text-[#1C1917] text-sm">{pkg.name}</h3>
+                        {pkg.badgeText && (
+                          <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded bg-[#F7EFE1] text-[#8B4A2B] border border-[#E2CFAF]">
+                            {pkg.badgeText}
+                          </span>
+                        )}
+                      </div>
+                      <div className="font-num text-xs font-semibold text-[#8B4A2B] mt-1">
                         ₱{pkg.basePrice.toLocaleString()}{' '}
-                        <span className="font-normal text-slate-500">
-                          ({pkg.baseHours} hrs • {pkg.basePax} PAX)
+                        <span className="font-sans font-normal text-[#78716C]">
+                          • {pkg.baseHours} hrs • {pkg.basePax} PAX
                         </span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-0.5 shrink-0">
                       <button
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
                           handleOpenPkgModal(pkg);
                         }}
-                        className="p-1 text-slate-400 hover:text-slate-700 rounded hover:bg-slate-100"
+                        className="p-1.5 text-[#78716C] hover:text-[#1C1917] rounded hover:bg-[#E5DFD3]/60 cursor-pointer"
                       >
                         <Edit2 className="w-3.5 h-3.5" />
                       </button>
@@ -572,7 +591,7 @@ export default function CatalogPage() {
                           e.stopPropagation();
                           handleDeletePackage(pkg.id, pkg.name);
                         }}
-                        className="p-1 text-slate-400 hover:text-rose-600 rounded hover:bg-slate-100"
+                        className="p-1.5 text-[#78716C] hover:text-[#9E3B33] rounded hover:bg-[#FBECEB] cursor-pointer"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -580,21 +599,23 @@ export default function CatalogPage() {
                   </div>
 
                   {pkg.description && (
-                    <p className="text-xs text-slate-500 mt-2 line-clamp-2">{pkg.description}</p>
+                    <p className="text-xs text-[#57534E] mt-2 line-clamp-2">{pkg.description}</p>
                   )}
 
                   {pkg.inclusions?.length > 0 && (
-                    <div className="mt-2 text-[11px] text-slate-600 space-y-0.5 bg-slate-50 p-2 rounded-lg">
-                      <div className="font-semibold text-slate-700">Inclusions:</div>
+                    <div className="mt-2.5 text-[11px] text-[#57534E] space-y-1 bg-[#FFFDF9] p-2.5 rounded-lg border border-[#EFECE4]">
+                      <div className="text-[10px] font-semibold uppercase tracking-wider text-[#78716C]">
+                        Inclusions ({pkg.inclusions.length})
+                      </div>
                       {pkg.inclusions.slice(0, 3).map((inc, i) => (
                         <div key={i} className="flex items-center gap-1.5 truncate">
-                          <Check className="w-3 h-3 text-emerald-600 shrink-0" />
+                          <Check className="w-3 h-3 text-[#2E5A44] shrink-0" />
                           <span className="truncate">{inc}</span>
                         </div>
                       ))}
                       {pkg.inclusions.length > 3 && (
-                        <div className="text-[10px] text-slate-400">
-                          +{pkg.inclusions.length - 3} more items
+                        <div className="text-[10px] text-[#78716C] pl-4">
+                          +{pkg.inclusions.length - 3} more inclusions
                         </div>
                       )}
                     </div>
@@ -606,57 +627,60 @@ export default function CatalogPage() {
         </div>
 
         {/* Column 3: Add-ons & Interval Options */}
-        <div className="lg:col-span-5 bg-white rounded-xl border border-slate-200 shadow-xs p-4 flex flex-col">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-            <div>
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
-                3. Add-ons & Intervals for
-              </span>
-              <span className="text-sm font-semibold text-slate-800">
-                {currentPackage?.name || 'Select a package'}
-              </span>
+        <div className="lg:col-span-5 bg-[#FFFDF9] rounded-xl border border-[#E5DFD3] p-5 flex flex-col">
+          <div className="flex items-center justify-between pb-3.5 border-b border-[#EFECE4]">
+            <div className="flex items-baseline gap-2">
+              <span className="font-num text-xs font-semibold text-[#8B4A2B]">03</span>
+              <div>
+                <span className="font-editorial text-base font-semibold text-[#1C1917] block leading-tight">
+                  Upgrades &amp; Add-ons
+                </span>
+                <span className="text-[11px] text-[#78716C]">
+                  Linked to {currentPackage?.name || 'selected package'}
+                </span>
+              </div>
             </div>
             <button
               type="button"
               onClick={() => handleOpenAddonModal()}
               disabled={!selectedPackageId}
-              className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg bg-teal-700 text-white hover:bg-teal-800 font-medium shadow-xs"
+              className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg bg-[#1C1917] text-[#FAF7F2] hover:bg-[#8B4A2B] font-medium transition-colors cursor-pointer"
             >
               <Plus className="w-3.5 h-3.5" />
-              Add Add-On
+              Add Upgrade
             </button>
           </div>
 
-          <div className="space-y-3 mt-3 flex-1 overflow-y-auto max-h-[700px] pr-1">
+          <div className="space-y-2.5 mt-3.5 flex-1 overflow-y-auto max-h-[680px] pr-1">
             {!selectedPackageId ? (
-              <div className="text-center py-12 text-slate-400 text-xs">
-                Select a package to configure its add-ons.
+              <div className="text-center py-12 text-[#78716C] text-xs">
+                Select a package on the left to manage its add-ons.
               </div>
             ) : currentAddons.length === 0 ? (
-              <div className="text-center py-12 text-slate-400 text-xs">
-                No add-ons created for this service yet. Click &quot;Add Add-On&quot; to add one.
+              <div className="text-center py-12 text-[#78716C] text-xs">
+                No add-ons registered for this package yet. Click &ldquo;Add Upgrade&rdquo; above.
               </div>
             ) : (
               currentAddons.map((addon) => (
                 <div
                   key={addon.id}
-                  className="p-3.5 rounded-xl border border-slate-200 hover:border-slate-300 bg-white transition-all shadow-xs"
+                  className="p-3.5 rounded-xl border border-[#E5DFD3] hover:border-[#C8B9A6] bg-[#FAF8F4]/60 transition-all"
                 >
-                  <div className="flex items-start justify-between">
+                  <div className="flex items-start justify-between gap-2">
                     <div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-semibold text-slate-900 text-sm">{addon.name}</span>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-semibold text-[#1C1917] text-xs">{addon.name}</span>
                         {addon.categoryTag && (
-                          <span className="text-[10px] font-medium uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+                          <span className="text-[10px] font-medium uppercase tracking-wider px-2 py-0.5 rounded bg-[#EFECE4] text-[#57534E]">
                             {addon.categoryTag}
                           </span>
                         )}
                       </div>
-                      <div className="text-xs text-teal-700 font-bold mt-1">
+                      <div className="font-num text-xs text-[#8B4A2B] font-semibold mt-1">
                         {addon.pricingType === 'interval' && (
                           <span>
                             ₱{addon.basePrice.toLocaleString()}{' '}
-                            <span className="font-normal text-slate-500">
+                            <span className="font-sans font-normal text-[#78716C]">
                               / {addon.intervalStep} {addon.intervalUnit}
                             </span>
                           </span>
@@ -664,43 +688,43 @@ export default function CatalogPage() {
                         {addon.pricingType === 'pax_dependent' && (
                           <span>
                             ₱{addon.basePrice.toLocaleString()}{' '}
-                            <span className="font-normal text-slate-500">per PAX</span>
+                            <span className="font-sans font-normal text-[#78716C]">per PAX</span>
                           </span>
                         )}
                         {addon.pricingType === 'fixed' && (
                           <span>
                             {addon.basePrice === 0 ? (
-                              <span className="text-emerald-600">Free / Default Included</span>
+                              <span className="text-[#2E5A44]">Complimentary / Included</span>
                             ) : (
-                              `₱${addon.basePrice.toLocaleString()} (Fixed)`
+                              `₱${addon.basePrice.toLocaleString()} Flat`
                             )}
                             {addon.defaultQuantity && (
-                              <span className="font-normal text-slate-500 ml-1">
-                                (Default: {addon.defaultQuantity} pcs)
+                              <span className="font-sans font-normal text-[#78716C] ml-1">
+                                (Default: {addon.defaultQuantity})
                               </span>
                             )}
                           </span>
                         )}
                         {addon.pricingType === 'variant' && (
-                          <span className="text-indigo-600">
-                            {addon.variants?.length || 0} Selectable Variants
+                          <span className="text-[#57534E]">
+                            {addon.variants?.length || 0} Size / Material Variants
                           </span>
                         )}
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-0.5 shrink-0">
                       <button
                         type="button"
                         onClick={() => handleOpenAddonModal(addon)}
-                        className="p-1 text-slate-400 hover:text-slate-700 rounded hover:bg-slate-100"
+                        className="p-1.5 text-[#78716C] hover:text-[#1C1917] rounded hover:bg-[#E5DFD3]/60 cursor-pointer"
                       >
                         <Edit2 className="w-3.5 h-3.5" />
                       </button>
                       <button
                         type="button"
                         onClick={() => handleDeleteAddon(addon.id, addon.name)}
-                        className="p-1 text-slate-400 hover:text-rose-600 rounded hover:bg-slate-100"
+                        className="p-1.5 text-[#78716C] hover:text-[#9E3B33] rounded hover:bg-[#FBECEB] cursor-pointer"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -708,28 +732,24 @@ export default function CatalogPage() {
                   </div>
 
                   {addon.description && (
-                    <p className="text-xs text-slate-500 mt-1">{addon.description}</p>
+                    <p className="text-xs text-[#68625D] mt-1">{addon.description}</p>
                   )}
 
-                  {/* Variants display */}
                   {addon.variants && addon.variants.length > 0 && (
-                    <div className="mt-2 pt-2 border-t border-slate-100 space-y-1">
-                      <div className="text-[11px] font-medium text-slate-400">Available Options:</div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
-                        {addon.variants.map((v) => (
-                          <div
-                            key={v.id}
-                            className="flex items-center justify-between text-xs px-2 py-1 bg-slate-50 rounded border border-slate-100"
-                          >
-                            <span className="text-slate-700 truncate">{v.name}</span>
-                            <span className="font-semibold text-slate-900 ml-2">
-                              {v.isPaxDependent
-                                ? `+₱${v.priceDelta}/pax`
-                                : `+₱${v.priceDelta.toLocaleString()}`}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
+                    <div className="mt-2.5 pt-2.5 border-t border-[#EFECE4] grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                      {addon.variants.map((v) => (
+                        <div
+                          key={v.id}
+                          className="flex items-center justify-between text-xs px-2.5 py-1 bg-[#FFFDF9] rounded border border-[#E5DFD3]"
+                        >
+                          <span className="text-[#292524] truncate">{v.name}</span>
+                          <span className="font-num font-semibold text-[#1C1917] ml-2">
+                            {v.isPaxDependent
+                              ? `+₱${v.priceDelta}/pax`
+                              : `+₱${v.priceDelta.toLocaleString()}`}
+                          </span>
+                        </div>
+                      ))}
                     </div>
                   )}
                 </div>
@@ -740,51 +760,53 @@ export default function CatalogPage() {
       </div>
 
       {/* ================= DROPDOWNS & MOBILIZATION ZONES MANAGEMENT ================= */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
-        {/* Location Zones & Mobilization Fees */}
-        <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-5 flex flex-col">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-            <div>
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                <MapPin className="w-3.5 h-3.5 text-teal-700" />
-                4. Location Zones & Mobilization Fees
-              </span>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Manage location dropdown options and default out-of-town mobilization rates.
-              </p>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Section 04: Location Zones & Mobilization Fees */}
+        <div className="bg-[#FFFDF9] rounded-xl border border-[#E5DFD3] p-5 flex flex-col">
+          <div className="flex items-center justify-between pb-3.5 border-b border-[#EFECE4]">
+            <div className="flex items-baseline gap-2.5">
+              <span className="font-num text-xs font-semibold text-[#8B4A2B]">04</span>
+              <div>
+                <h2 className="font-editorial text-base font-semibold text-[#1C1917]">
+                  Location Zones &amp; Mobilization Rates
+                </h2>
+                <p className="text-[11px] text-[#78716C]">
+                  Controls the Location Zone dropdown and default travel fees on proposals.
+                </p>
+              </div>
             </div>
             <button
               type="button"
               onClick={() => handleOpenZoneModal()}
-              className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg bg-teal-50 text-teal-700 hover:bg-teal-100 font-medium cursor-pointer"
+              className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg bg-[#F5F2EB] text-[#1C1917] hover:bg-[#E7E1D5] border border-[#D6CFC2] font-medium cursor-pointer shrink-0"
             >
-              <Plus className="w-3.5 h-3.5" />
+              <Plus className="w-3.5 h-3.5 text-[#8B4A2B]" />
               Add Zone
             </button>
           </div>
 
-          <div className="space-y-2 mt-3 max-h-72 overflow-y-auto pr-1">
+          <div className="space-y-2 mt-3.5 max-h-72 overflow-y-auto pr-1">
             {zones.map((z) => (
               <div
                 key={z.id}
-                className="flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:border-slate-300 bg-slate-50/50 transition-all"
+                className="flex items-center justify-between p-3 rounded-lg border border-[#E5DFD3] hover:border-[#C8B9A6] bg-[#FAF8F4]/70 transition-all"
               >
                 <div className="min-w-0 pr-3">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-semibold text-slate-900 truncate">{z.name}</span>
-                    <span className="text-[11px] font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200">
+                    <span className="text-xs font-semibold text-[#1C1917] truncate">{z.name}</span>
+                    <span className="font-num text-[11px] font-semibold text-[#8B4A2B] bg-[#F7EFE1] px-2 py-0.5 rounded border border-[#E2CFAF]">
                       ₱{z.defaultFee.toLocaleString()}
                     </span>
                   </div>
                   {z.description && (
-                    <p className="text-[11px] text-slate-500 truncate mt-0.5">{z.description}</p>
+                    <p className="text-[11px] text-[#78716C] truncate mt-0.5">{z.description}</p>
                   )}
                 </div>
-                <div className="flex items-center gap-1 shrink-0">
+                <div className="flex items-center gap-0.5 shrink-0">
                   <button
                     type="button"
                     onClick={() => handleOpenZoneModal(z)}
-                    className="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-200/60 cursor-pointer"
+                    className="p-1.5 text-[#78716C] hover:text-[#1C1917] rounded hover:bg-[#E5DFD3]/60 cursor-pointer"
                     title="Edit Zone"
                   >
                     <Edit2 className="w-3.5 h-3.5" />
@@ -792,7 +814,7 @@ export default function CatalogPage() {
                   <button
                     type="button"
                     onClick={() => handleDeleteZone(z.id, z.name)}
-                    className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 cursor-pointer"
+                    className="p-1.5 text-[#78716C] hover:text-[#9E3B33] rounded hover:bg-[#FBECEB] cursor-pointer"
                     title="Delete Zone"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -803,49 +825,51 @@ export default function CatalogPage() {
           </div>
         </div>
 
-        {/* Event Types Dropdown Options */}
-        <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-5 flex flex-col">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-            <div>
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                <Calendar className="w-3.5 h-3.5 text-teal-700" />
-                5. Event Types Dropdown
-              </span>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Customize event categories selectable on the Proposal Calculator.
-              </p>
+        {/* Section 05: Event Types Dropdown Options */}
+        <div className="bg-[#FFFDF9] rounded-xl border border-[#E5DFD3] p-5 flex flex-col">
+          <div className="flex items-center justify-between pb-3.5 border-b border-[#EFECE4]">
+            <div className="flex items-baseline gap-2.5">
+              <span className="font-num text-xs font-semibold text-[#8B4A2B]">05</span>
+              <div>
+                <h2 className="font-editorial text-base font-semibold text-[#1C1917]">
+                  Event Occasion Dropdown Options
+                </h2>
+                <p className="text-[11px] text-[#78716C]">
+                  Manage event occasions selectable on client proposals and invoices.
+                </p>
+              </div>
             </div>
             <button
               type="button"
               onClick={() => handleOpenEventTypeModal()}
-              className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg bg-teal-50 text-teal-700 hover:bg-teal-100 font-medium cursor-pointer"
+              className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg bg-[#F5F2EB] text-[#1C1917] hover:bg-[#E7E1D5] border border-[#D6CFC2] font-medium cursor-pointer shrink-0"
             >
-              <Plus className="w-3.5 h-3.5" />
-              Add Event Type
+              <Plus className="w-3.5 h-3.5 text-[#8B4A2B]" />
+              Add Occasion
             </button>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3 max-h-72 overflow-y-auto pr-1">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3.5 max-h-72 overflow-y-auto pr-1">
             {eventTypes.map((ev) => (
               <div
                 key={ev}
-                className="flex items-center justify-between p-2.5 rounded-xl border border-slate-200 hover:border-slate-300 bg-slate-50/50 transition-all"
+                className="flex items-center justify-between p-2.5 rounded-lg border border-[#E5DFD3] hover:border-[#C8B9A6] bg-[#FAF8F4]/70 transition-all"
               >
-                <span className="text-xs font-semibold text-slate-800 truncate pr-2">{ev}</span>
-                <div className="flex items-center gap-1 shrink-0">
+                <span className="text-xs font-medium text-[#1C1917] truncate pr-2">{ev}</span>
+                <div className="flex items-center gap-0.5 shrink-0">
                   <button
                     type="button"
                     onClick={() => handleOpenEventTypeModal(ev)}
-                    className="p-1 text-slate-400 hover:text-slate-700 rounded hover:bg-slate-200/60 cursor-pointer"
-                    title="Edit Event Type"
+                    className="p-1 text-[#78716C] hover:text-[#1C1917] rounded hover:bg-[#E5DFD3]/60 cursor-pointer"
+                    title="Edit Occasion"
                   >
                     <Edit2 className="w-3.5 h-3.5" />
                   </button>
                   <button
                     type="button"
                     onClick={() => handleDeleteEventType(ev)}
-                    className="p-1 text-slate-400 hover:text-rose-600 rounded hover:bg-rose-50 cursor-pointer"
-                    title="Delete Event Type"
+                    className="p-1 text-[#78716C] hover:text-[#9E3B33] rounded hover:bg-[#FBECEB] cursor-pointer"
+                    title="Delete Occasion"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
@@ -858,48 +882,47 @@ export default function CatalogPage() {
 
       {/* Category Modal */}
       {showCategoryModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
-            <h3 className="text-lg font-bold text-slate-900">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-[2px]">
+          <div className="bg-[#FFFDF9] border border-[#DED8CC] rounded-xl max-w-md w-full p-6 shadow-2xl">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#8B4A2B]">
+              Catalog Category
+            </span>
+            <h3 className="font-editorial text-xl font-semibold text-[#1C1917] mt-0.5">
               {editingCategory ? 'Edit Service Category' : 'Create Service Category'}
             </h3>
-            <form onSubmit={handleSaveCategory} className="mt-4 space-y-4">
+            <form onSubmit={handleSaveCategory} className="mt-4 space-y-4 text-xs">
               <div>
-                <label className="block text-xs font-semibold text-slate-700 uppercase">
-                  Category Name
-                </label>
+                <label className="block font-medium text-[#292524] mb-1">Category Name</label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. The Happy Club, Studios Services"
+                  placeholder="e.g. Photobooth, DIY Craft Station, 360 Booth"
                   value={catName}
                   onChange={(e) => setCatName(e.target.value)}
-                  className="mt-1 w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-teal-600"
+                  className="w-full px-3.5 py-2 text-sm border border-[#D6CFC2] rounded-lg bg-white text-[#1C1917]"
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-slate-700 uppercase">
-                  Description
-                </label>
+                <label className="block font-medium text-[#292524] mb-1">Description</label>
                 <textarea
                   rows={2}
                   placeholder="Brief description of the service line"
                   value={catDesc}
                   onChange={(e) => setCatDesc(e.target.value)}
-                  className="mt-1 w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-teal-600"
+                  className="w-full px-3.5 py-2 text-sm border border-[#D6CFC2] rounded-lg bg-white text-[#1C1917]"
                 />
               </div>
               <div className="flex justify-end gap-2 pt-2">
                 <button
                   type="button"
                   onClick={() => setShowCategoryModal(false)}
-                  className="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg"
+                  className="px-4 py-2 text-xs text-[#57534E] hover:bg-[#EFECE4] rounded-lg cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-sm bg-teal-700 hover:bg-teal-800 text-white rounded-lg font-medium"
+                  className="px-4 py-2 text-xs bg-[#1C1917] hover:bg-[#8B4A2B] text-[#FAF7F2] rounded-lg font-medium transition-colors cursor-pointer"
                 >
                   Save Category
                 </button>
@@ -911,119 +934,108 @@ export default function CatalogPage() {
 
       {/* Package Modal */}
       {showPackageModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl my-8">
-            <h3 className="text-lg font-bold text-slate-900">
-              {editingPackage ? 'Edit Package' : 'Create Package'}
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 overflow-y-auto backdrop-blur-[2px]">
+          <div className="bg-[#FFFDF9] border border-[#DED8CC] rounded-xl max-w-lg w-full p-6 shadow-2xl my-8">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#8B4A2B]">
+              Service Tier Configuration
+            </span>
+            <h3 className="font-editorial text-xl font-semibold text-[#1C1917] mt-0.5">
+              {editingPackage ? 'Edit Service Package' : 'Create Service Package'}
             </h3>
-            <form onSubmit={handleSavePackage} className="mt-4 space-y-3.5">
+            <form onSubmit={handleSavePackage} className="mt-4 space-y-3.5 text-xs">
               <div>
-                <label className="block text-xs font-semibold text-slate-700 uppercase">
-                  Package Name
-                </label>
+                <label className="block font-medium text-[#292524] mb-1">Package Name</label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Premium Photobooth, Sinta Wedding Day Coverage"
+                  placeholder="e.g. Premium Photobooth, Sinta Wedding Coverage"
                   value={pkgName}
                   onChange={(e) => setPkgName(e.target.value)}
-                  className="mt-1 w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-teal-600"
+                  className="w-full px-3.5 py-2 text-sm border border-[#D6CFC2] rounded-lg bg-white text-[#1C1917]"
                 />
               </div>
 
               <div className="grid grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 uppercase">
-                    Script Title (Canva)
+                  <label className="block font-medium text-[#292524] mb-1">
+                    Canva Script Title
                   </label>
                   <input
                     type="text"
                     placeholder="e.g. Sinta, Classic"
                     value={pkgScriptTitle}
                     onChange={(e) => setPkgScriptTitle(e.target.value)}
-                    className="mt-1 w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-teal-600"
+                    className="w-full px-3 py-2 text-sm border border-[#D6CFC2] rounded-lg bg-white"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 uppercase">
-                    Subtitle
-                  </label>
+                  <label className="block font-medium text-[#292524] mb-1">Subtitle</label>
                   <input
                     type="text"
-                    placeholder="e.g. Wedding Day Coverage"
+                    placeholder="e.g. Wedding Day"
                     value={pkgSubtitle}
                     onChange={(e) => setPkgSubtitle(e.target.value)}
-                    className="mt-1 w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-teal-600"
+                    className="w-full px-3 py-2 text-sm border border-[#D6CFC2] rounded-lg bg-white"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 uppercase">
-                    Promo Badge
-                  </label>
+                  <label className="block font-medium text-[#292524] mb-1">Promo Badge</label>
                   <input
                     type="text"
                     placeholder="e.g. 15% OFF"
                     value={pkgBadgeText}
                     onChange={(e) => setPkgBadgeText(e.target.value)}
-                    className="mt-1 w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-teal-600"
+                    className="w-full px-3 py-2 text-sm border border-[#D6CFC2] rounded-lg bg-white"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 uppercase">
-                    Base Price (₱)
-                  </label>
+                  <label className="block font-medium text-[#292524] mb-1">Base Price (₱)</label>
                   <input
                     type="number"
                     required
                     value={pkgPrice}
                     onChange={(e) => setPkgPrice(e.target.value)}
-                    className="mt-1 w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-teal-600"
+                    className="w-full px-3 py-2 text-sm font-num border border-[#D6CFC2] rounded-lg bg-white"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 uppercase">
-                    Base Hours
-                  </label>
+                  <label className="block font-medium text-[#292524] mb-1">Base Hours</label>
                   <input
                     type="number"
                     step="0.5"
                     value={pkgHours}
                     onChange={(e) => setPkgHours(e.target.value)}
-                    className="mt-1 w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-teal-600"
+                    className="w-full px-3 py-2 text-sm font-num border border-[#D6CFC2] rounded-lg bg-white"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 uppercase">
-                    Base PAX
-                  </label>
+                  <label className="block font-medium text-[#292524] mb-1">Base PAX</label>
                   <input
                     type="number"
                     value={pkgPax}
                     onChange={(e) => setPkgPax(e.target.value)}
-                    className="mt-1 w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-teal-600"
+                    className="w-full px-3 py-2 text-sm font-num border border-[#D6CFC2] rounded-lg bg-white"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 uppercase">
-                  Description
-                </label>
+                <label className="block font-medium text-[#292524] mb-1">Description</label>
                 <textarea
                   rows={2}
-                  placeholder="What makes this package special"
+                  placeholder="Summary of the package"
                   value={pkgDesc}
                   onChange={(e) => setPkgDesc(e.target.value)}
-                  className="mt-1 w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-teal-600"
+                  className="w-full px-3 py-2 text-sm border border-[#D6CFC2] rounded-lg bg-white"
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 uppercase">
+                  <label className="block font-medium text-[#292524] mb-1">
                     Inclusions (One per line)
                   </label>
                   <textarea
@@ -1031,11 +1043,11 @@ export default function CatalogPage() {
                     placeholder="2 Hours Unlimited Prints&#10;Custom Print Layout&#10;On-site Attendant"
                     value={pkgInclusions}
                     onChange={(e) => setPkgInclusions(e.target.value)}
-                    className="mt-1 w-full px-3 py-2 font-mono text-xs border border-slate-300 rounded-lg focus:outline-teal-600"
+                    className="w-full px-3 py-2 font-mono text-xs border border-[#D6CFC2] rounded-lg bg-white"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 uppercase">
+                  <label className="block font-medium text-[#292524] mb-1">
                     Freebies (One per line)
                   </label>
                   <textarea
@@ -1043,7 +1055,7 @@ export default function CatalogPage() {
                     placeholder="Magnetic Photo Frame&#10;Online Gallery Access"
                     value={pkgFreebies}
                     onChange={(e) => setPkgFreebies(e.target.value)}
-                    className="mt-1 w-full px-3 py-2 font-mono text-xs border border-slate-300 rounded-lg focus:outline-teal-600"
+                    className="w-full px-3 py-2 font-mono text-xs border border-[#D6CFC2] rounded-lg bg-white"
                   />
                 </div>
               </div>
@@ -1052,13 +1064,13 @@ export default function CatalogPage() {
                 <button
                   type="button"
                   onClick={() => setShowPackageModal(false)}
-                  className="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg"
+                  className="px-4 py-2 text-xs text-[#57534E] hover:bg-[#EFECE4] rounded-lg cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-sm bg-teal-700 hover:bg-teal-800 text-white rounded-lg font-medium"
+                  className="px-4 py-2 text-xs bg-[#1C1917] hover:bg-[#8B4A2B] text-[#FAF7F2] rounded-lg font-medium transition-colors cursor-pointer"
                 >
                   Save Package
                 </button>
@@ -1070,109 +1082,110 @@ export default function CatalogPage() {
 
       {/* Addon Modal */}
       {showAddonModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 overflow-y-auto">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl my-8">
-            <h3 className="text-lg font-bold text-slate-900">
-              {editingAddon ? 'Edit Add-On' : 'Add New Add-On'}
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 overflow-y-auto backdrop-blur-[2px]">
+          <div className="bg-[#FFFDF9] border border-[#DED8CC] rounded-xl max-w-lg w-full p-6 shadow-2xl my-8">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#8B4A2B]">
+              Service Upgrade / Add-On
+            </span>
+            <h3 className="font-editorial text-xl font-semibold text-[#1C1917] mt-0.5">
+              {editingAddon ? 'Edit Upgrade Item' : 'New Upgrade Item'}
             </h3>
-            <p className="text-xs text-slate-500 mt-1">
-              Adding to package: <strong className="text-slate-800">{currentPackage?.name}</strong>
+            <p className="text-xs text-[#78716C] mt-0.5">
+              Assigned to package:{' '}
+              <strong className="text-[#1C1917]">{currentPackage?.name}</strong>
             </p>
 
-            <form onSubmit={handleSaveAddon} className="mt-4 space-y-4">
+            <form onSubmit={handleSaveAddon} className="mt-4 space-y-4 text-xs">
               <div className="grid grid-cols-2 gap-3">
                 <div className="col-span-2 sm:col-span-1">
-                  <label className="block text-xs font-semibold text-slate-700 uppercase">
-                    Add-on Name
-                  </label>
+                  <label className="block font-medium text-[#292524] mb-1">Add-on Name</label>
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Additional Hours, Custom Backdrop"
+                    placeholder="e.g. Sintra Welcome Board, Extra Hour"
                     value={addonName}
                     onChange={(e) => setAddonName(e.target.value)}
-                    className="mt-1 w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-teal-600"
+                    className="w-full px-3 py-2 text-sm border border-[#D6CFC2] rounded-lg bg-white"
                   />
                 </div>
                 <div className="col-span-2 sm:col-span-1">
-                  <label className="block text-xs font-semibold text-slate-700 uppercase">
+                  <label className="block font-medium text-[#292524] mb-1">
                     Category Tag (Optional)
                   </label>
                   <input
                     type="text"
-                    placeholder="e.g. Duration, Props, Setup"
+                    placeholder="e.g. Props, Duration, Setup"
                     value={addonTag}
                     onChange={(e) => setAddonTag(e.target.value)}
-                    className="mt-1 w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-teal-600"
+                    className="w-full px-3 py-2 text-sm border border-[#D6CFC2] rounded-lg bg-white"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 uppercase">
+                <label className="block font-medium text-[#292524] mb-1.5">
                   Pricing Calculation Model
                 </label>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-1">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                   {(
                     [
                       { id: 'interval', label: 'Interval Step', desc: 'Per hr / 100 pax' },
-                      { id: 'variant', label: 'Variants', desc: 'Selectable items' },
-                      { id: 'fixed', label: 'Fixed / Default', desc: 'One flat fee / free' },
-                      { id: 'pax_dependent', label: 'PAX Dependent', desc: 'Multiplier × PAX' },
+                      { id: 'variant', label: 'Variants', desc: 'Sizes / Materials' },
+                      { id: 'fixed', label: 'Flat Fee', desc: 'Fixed rate' },
+                      { id: 'pax_dependent', label: 'Per PAX', desc: 'Rate × PAX' },
                     ] as const
                   ).map((m) => (
                     <button
                       key={m.id}
                       type="button"
                       onClick={() => setAddonPricingType(m.id)}
-                      className={`p-2.5 rounded-lg border text-left transition-all ${
+                      className={`p-2.5 rounded-lg border text-left transition-all cursor-pointer ${
                         addonPricingType === m.id
-                          ? 'border-teal-600 bg-teal-50/70 text-teal-900 font-semibold'
-                          : 'border-slate-200 text-slate-600 hover:bg-slate-50'
+                          ? 'border-[#8B4A2B] bg-[#FAF6F0] text-[#1C1917] font-semibold'
+                          : 'border-[#E5DFD3] bg-[#FAF8F4] text-[#57534E] hover:border-[#C8B9A6]'
                       }`}
                     >
                       <div className="text-xs">{m.label}</div>
-                      <div className="text-[10px] text-slate-400 mt-0.5">{m.desc}</div>
+                      <div className="text-[10px] text-[#78716C] mt-0.5">{m.desc}</div>
                     </button>
                   ))}
                 </div>
               </div>
 
-              {/* Conditional pricing fields */}
               {addonPricingType === 'interval' && (
-                <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-3">
-                  <div className="text-xs font-bold text-slate-700">Interval Settings:</div>
+                <div className="bg-[#FAF8F4] p-3.5 rounded-lg border border-[#E5DFD3] space-y-3">
+                  <div className="text-xs font-semibold text-[#1C1917]">Interval Configuration</div>
                   <div className="grid grid-cols-3 gap-2">
                     <div>
-                      <label className="block text-[11px] font-semibold text-slate-500 uppercase">
+                      <label className="block text-[10px] font-semibold text-[#78716C] uppercase">
                         Price (₱)
                       </label>
                       <input
                         type="number"
                         value={addonBasePrice}
                         onChange={(e) => setAddonBasePrice(e.target.value)}
-                        className="mt-1 w-full px-2.5 py-1.5 text-sm bg-white border border-slate-300 rounded-lg"
+                        className="mt-1 w-full px-2.5 py-1.5 text-sm font-num bg-white border border-[#D6CFC2] rounded-lg"
                       />
                     </div>
                     <div>
-                      <label className="block text-[11px] font-semibold text-slate-500 uppercase">
-                        Every Step
+                      <label className="block text-[10px] font-semibold text-[#78716C] uppercase">
+                        Step Size
                       </label>
                       <input
                         type="number"
                         value={addonIntervalStep}
                         onChange={(e) => setAddonIntervalStep(e.target.value)}
-                        className="mt-1 w-full px-2.5 py-1.5 text-sm bg-white border border-slate-300 rounded-lg"
+                        className="mt-1 w-full px-2.5 py-1.5 text-sm font-num bg-white border border-[#D6CFC2] rounded-lg"
                       />
                     </div>
                     <div>
-                      <label className="block text-[11px] font-semibold text-slate-500 uppercase">
+                      <label className="block text-[10px] font-semibold text-[#78716C] uppercase">
                         Unit
                       </label>
                       <select
                         value={addonIntervalUnit}
                         onChange={(e) => setAddonIntervalUnit(e.target.value as IntervalUnit)}
-                        className="mt-1 w-full px-2.5 py-1.5 text-sm bg-white border border-slate-300 rounded-lg"
+                        className="mt-1 w-full px-2.5 py-1.5 text-sm bg-white border border-[#D6CFC2] rounded-lg"
                       >
                         <option value="HOUR">HOUR</option>
                         <option value="PAX">PAX</option>
@@ -1183,84 +1196,72 @@ export default function CatalogPage() {
                       </select>
                     </div>
                   </div>
-                  <p className="text-[11px] text-slate-500">
-                    Example: ₱{addonBasePrice} per {addonIntervalStep} {addonIntervalUnit}
-                  </p>
                 </div>
               )}
 
               {addonPricingType === 'fixed' && (
-                <div className="grid grid-cols-2 gap-3 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                <div className="grid grid-cols-2 gap-3 bg-[#FAF8F4] p-3.5 rounded-lg border border-[#E5DFD3]">
                   <div>
-                    <label className="block text-[11px] font-semibold text-slate-500 uppercase">
-                      Fixed Price (₱)
+                    <label className="block text-[10px] font-semibold text-[#78716C] uppercase">
+                      Flat Price (₱)
                     </label>
                     <input
                       type="number"
                       value={addonBasePrice}
                       onChange={(e) => setAddonBasePrice(e.target.value)}
-                      className="mt-1 w-full px-2.5 py-1.5 text-sm bg-white border border-slate-300 rounded-lg"
+                      className="mt-1 w-full px-2.5 py-1.5 text-sm font-num bg-white border border-[#D6CFC2] rounded-lg"
                     />
                   </div>
                   <div>
-                    <label className="block text-[11px] font-semibold text-slate-500 uppercase">
+                    <label className="block text-[10px] font-semibold text-[#78716C] uppercase">
                       Default Qty
                     </label>
                     <input
                       type="number"
                       value={addonDefaultQty}
                       onChange={(e) => setAddonDefaultQty(e.target.value)}
-                      className="mt-1 w-full px-2.5 py-1.5 text-sm bg-white border border-slate-300 rounded-lg"
+                      className="mt-1 w-full px-2.5 py-1.5 text-sm font-num bg-white border border-[#D6CFC2] rounded-lg"
                     />
                   </div>
                 </div>
               )}
 
               {addonPricingType === 'pax_dependent' && (
-                <div className="bg-slate-50 p-3 rounded-xl border border-slate-200">
-                  <label className="block text-[11px] font-semibold text-slate-500 uppercase">
+                <div className="bg-[#FAF8F4] p-3.5 rounded-lg border border-[#E5DFD3]">
+                  <label className="block text-[10px] font-semibold text-[#78716C] uppercase">
                     Price per PAX (₱)
                   </label>
                   <input
                     type="number"
                     value={addonBasePrice}
                     onChange={(e) => setAddonBasePrice(e.target.value)}
-                    className="mt-1 w-full px-2.5 py-1.5 text-sm bg-white border border-slate-300 rounded-lg"
+                    className="mt-1 w-full px-2.5 py-1.5 text-sm font-num bg-white border border-[#D6CFC2] rounded-lg"
                   />
-                  <p className="text-[11px] text-slate-500 mt-1">
-                    Multiplies automatically by the proposal&apos;s event PAX count.
-                  </p>
                 </div>
               )}
 
               {addonPricingType === 'variant' && (
-                <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-3">
-                  <div className="text-xs font-bold text-slate-700">Sub-Variants & Options:</div>
+                <div className="bg-[#FAF8F4] p-3.5 rounded-lg border border-[#E5DFD3] space-y-3">
+                  <div className="text-xs font-semibold text-[#1C1917]">
+                    Selectable Variants &amp; Sizes
+                  </div>
 
-                  {/* List of current variants */}
                   {addonVariants.length > 0 && (
                     <div className="space-y-1.5">
                       {addonVariants.map((v) => (
                         <div
                           key={v.id}
-                          className="flex items-center justify-between text-xs px-2.5 py-1.5 bg-white rounded border border-slate-200"
+                          className="flex items-center justify-between text-xs px-2.5 py-1.5 bg-white rounded border border-[#E5DFD3]"
                         >
-                          <div>
-                            <span className="font-medium text-slate-800">{v.name}</span>
-                            {v.isPaxDependent && (
-                              <span className="ml-1 text-[10px] text-amber-700 font-semibold bg-amber-50 px-1 py-0.5 rounded">
-                                PAX Dependent
-                              </span>
-                            )}
-                          </div>
+                          <span className="font-medium text-[#1C1917]">{v.name}</span>
                           <div className="flex items-center gap-2">
-                            <span className="font-bold text-teal-800">
+                            <span className="font-num font-semibold text-[#8B4A2B]">
                               {v.isPaxDependent ? `+₱${v.priceDelta}/pax` : `+₱${v.priceDelta}`}
                             </span>
                             <button
                               type="button"
                               onClick={() => handleRemoveVariant(v.id)}
-                              className="text-slate-400 hover:text-rose-600"
+                              className="text-[#78716C] hover:text-[#9E3B33] cursor-pointer"
                             >
                               <X className="w-3.5 h-3.5" />
                             </button>
@@ -1270,60 +1271,55 @@ export default function CatalogPage() {
                     </div>
                   )}
 
-                  {/* Add variant input */}
-                  <div className="pt-2 border-t border-slate-200">
-                    <div className="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center">
-                      <div className="sm:col-span-6">
+                  <div className="pt-2 border-t border-[#E5DFD3] grid grid-cols-1 sm:grid-cols-12 gap-2 items-center">
+                    <div className="sm:col-span-6">
+                      <input
+                        type="text"
+                        placeholder="Option label (e.g. A3 Board)"
+                        value={newVariantName}
+                        onChange={(e) => setNewVariantName(e.target.value)}
+                        className="w-full px-2.5 py-1.5 text-xs bg-white border border-[#D6CFC2] rounded"
+                      />
+                    </div>
+                    <div className="sm:col-span-3">
+                      <input
+                        type="number"
+                        placeholder="Price (₱)"
+                        value={newVariantPrice}
+                        onChange={(e) => setNewVariantPrice(e.target.value)}
+                        className="w-full px-2.5 py-1.5 text-xs font-num bg-white border border-[#D6CFC2] rounded"
+                      />
+                    </div>
+                    <div className="sm:col-span-3 flex items-center justify-end gap-2">
+                      <label className="text-[10px] text-[#57534E] flex items-center gap-1 cursor-pointer">
                         <input
-                          type="text"
-                          placeholder="Option name (e.g. Magnetic, Cloth)"
-                          value={newVariantName}
-                          onChange={(e) => setNewVariantName(e.target.value)}
-                          className="w-full px-2 py-1 text-xs bg-white border border-slate-300 rounded"
+                          type="checkbox"
+                          checked={newVariantIsPax}
+                          onChange={(e) => setNewVariantIsPax(e.target.checked)}
+                          className="rounded accent-[#8B4A2B]"
                         />
-                      </div>
-                      <div className="sm:col-span-3">
-                        <input
-                          type="number"
-                          placeholder="Price (+₱)"
-                          value={newVariantPrice}
-                          onChange={(e) => setNewVariantPrice(e.target.value)}
-                          className="w-full px-2 py-1 text-xs bg-white border border-slate-300 rounded"
-                        />
-                      </div>
-                      <div className="sm:col-span-3 flex items-center justify-end gap-2">
-                        <label className="text-[10px] text-slate-600 flex items-center gap-1 cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={newVariantIsPax}
-                            onChange={(e) => setNewVariantIsPax(e.target.checked)}
-                            className="rounded text-teal-600"
-                          />
-                          /PAX
-                        </label>
-                        <button
-                          type="button"
-                          onClick={handleAddVariant}
-                          className="px-2 py-1 bg-slate-800 text-white rounded text-xs font-medium hover:bg-slate-700"
-                        >
-                          Add
-                        </button>
-                      </div>
+                        /PAX
+                      </label>
+                      <button
+                        type="button"
+                        onClick={handleAddVariant}
+                        className="px-2.5 py-1.5 bg-[#1C1917] text-[#FAF7F2] rounded text-xs font-medium hover:bg-[#8B4A2B] cursor-pointer"
+                      >
+                        Add
+                      </button>
                     </div>
                   </div>
                 </div>
               )}
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 uppercase">
-                  Description
-                </label>
+                <label className="block font-medium text-[#292524] mb-1">Description</label>
                 <textarea
                   rows={2}
-                  placeholder="Notes or details on what this add-on provides"
+                  placeholder="Optional notes on what this upgrade includes"
                   value={addonDesc}
                   onChange={(e) => setAddonDesc(e.target.value)}
-                  className="mt-1 w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-teal-600"
+                  className="w-full px-3 py-2 text-sm border border-[#D6CFC2] rounded-lg bg-white"
                 />
               </div>
 
@@ -1331,15 +1327,15 @@ export default function CatalogPage() {
                 <button
                   type="button"
                   onClick={() => setShowAddonModal(false)}
-                  className="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg"
+                  className="px-4 py-2 text-xs text-[#57534E] hover:bg-[#EFECE4] rounded-lg cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-sm bg-teal-700 hover:bg-teal-800 text-white rounded-lg font-medium"
+                  className="px-4 py-2 text-xs bg-[#1C1917] hover:bg-[#8B4A2B] text-[#FAF7F2] rounded-lg font-medium transition-colors cursor-pointer"
                 >
-                  Save Add-On
+                  Save Upgrade
                 </button>
               </div>
             </form>
@@ -1349,27 +1345,28 @@ export default function CatalogPage() {
 
       {/* Location Zone Modal */}
       {showZoneModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
-            <h3 className="text-lg font-bold text-slate-900">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-[2px]">
+          <div className="bg-[#FFFDF9] border border-[#DED8CC] rounded-xl max-w-md w-full p-6 shadow-2xl">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#8B4A2B]">
+              Mobilization Zone
+            </span>
+            <h3 className="font-editorial text-xl font-semibold text-[#1C1917] mt-0.5">
               {editingZone ? 'Edit Location Zone' : 'Add Location Zone'}
             </h3>
-            <form onSubmit={handleSaveZone} className="mt-4 space-y-4">
+            <form onSubmit={handleSaveZone} className="mt-4 space-y-4 text-xs">
               <div>
-                <label className="block text-xs font-semibold text-slate-700 uppercase">
-                  Zone / Region Name
-                </label>
+                <label className="block font-medium text-[#292524] mb-1">Zone / Region Name</label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Subic / Zambales / Bataan"
+                  placeholder="e.g. Tagaytay / Cavite / Batangas"
                   value={zoneName}
                   onChange={(e) => setZoneName(e.target.value)}
-                  className="mt-1 w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-teal-600"
+                  className="w-full px-3.5 py-2 text-sm border border-[#D6CFC2] rounded-lg bg-white"
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-slate-700 uppercase">
+                <label className="block font-medium text-[#292524] mb-1">
                   Default Mobilization Fee (₱)
                 </label>
                 <input
@@ -1378,32 +1375,32 @@ export default function CatalogPage() {
                   min={0}
                   value={zoneFee}
                   onChange={(e) => setZoneFee(e.target.value)}
-                  className="mt-1 w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-teal-600"
+                  className="w-full px-3.5 py-2 text-sm font-num border border-[#D6CFC2] rounded-lg bg-white"
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-slate-700 uppercase">
-                  Description / Notes
+                <label className="block font-medium text-[#292524] mb-1">
+                  Coverage Notes (Optional)
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g. Northern Luzon Zone"
+                  placeholder="e.g. South Luzon out-of-town rate"
                   value={zoneDesc}
                   onChange={(e) => setZoneDesc(e.target.value)}
-                  className="mt-1 w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-teal-600"
+                  className="w-full px-3.5 py-2 text-sm border border-[#D6CFC2] rounded-lg bg-white"
                 />
               </div>
               <div className="flex justify-end gap-2 pt-2">
                 <button
                   type="button"
                   onClick={() => setShowZoneModal(false)}
-                  className="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg"
+                  className="px-4 py-2 text-xs text-[#57534E] hover:bg-[#EFECE4] rounded-lg cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-sm bg-teal-700 hover:bg-teal-800 text-white rounded-lg font-medium"
+                  className="px-4 py-2 text-xs bg-[#1C1917] hover:bg-[#8B4A2B] text-[#FAF7F2] rounded-lg font-medium transition-colors cursor-pointer"
                 >
                   Save Zone
                 </button>
@@ -1415,38 +1412,39 @@ export default function CatalogPage() {
 
       {/* Event Type Modal */}
       {showEventTypeModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
-            <h3 className="text-lg font-bold text-slate-900">
-              {editingEventType ? 'Edit Event Type' : 'Add Event Type'}
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-[2px]">
+          <div className="bg-[#FFFDF9] border border-[#DED8CC] rounded-xl max-w-md w-full p-6 shadow-2xl">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#8B4A2B]">
+              Event Occasion
+            </span>
+            <h3 className="font-editorial text-xl font-semibold text-[#1C1917] mt-0.5">
+              {editingEventType ? 'Edit Event Occasion' : 'Add Event Occasion'}
             </h3>
-            <form onSubmit={handleSaveEventType} className="mt-4 space-y-4">
+            <form onSubmit={handleSaveEventType} className="mt-4 space-y-4 text-xs">
               <div>
-                <label className="block text-xs font-semibold text-slate-700 uppercase">
-                  Event Type Label
-                </label>
+                <label className="block font-medium text-[#292524] mb-1">Occasion Label</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. Wedding, Debut, Corporate Gala"
                   value={eventTypeName}
                   onChange={(e) => setEventTypeName(e.target.value)}
-                  className="mt-1 w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-teal-600"
+                  className="w-full px-3.5 py-2 text-sm border border-[#D6CFC2] rounded-lg bg-white"
                 />
               </div>
               <div className="flex justify-end gap-2 pt-2">
                 <button
                   type="button"
                   onClick={() => setShowEventTypeModal(false)}
-                  className="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg"
+                  className="px-4 py-2 text-xs text-[#57534E] hover:bg-[#EFECE4] rounded-lg cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-sm bg-teal-700 hover:bg-teal-800 text-white rounded-lg font-medium"
+                  className="px-4 py-2 text-xs bg-[#1C1917] hover:bg-[#8B4A2B] text-[#FAF7F2] rounded-lg font-medium transition-colors cursor-pointer"
                 >
-                  Save Event Type
+                  Save Occasion
                 </button>
               </div>
             </form>

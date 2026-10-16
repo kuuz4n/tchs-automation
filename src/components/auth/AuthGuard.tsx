@@ -46,11 +46,11 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   // Loading state while checking authentication
   if (checking) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50">
-        <div className="w-12 h-12 rounded-2xl bg-teal-800 text-white flex items-center justify-center animate-pulse mb-3">
-          <Lock className="w-6 h-6 text-amber-300" />
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#F5F2EB]">
+        <div className="w-10 h-10 rounded-lg bg-[#1C1917] text-[#F5F2EB] flex items-center justify-center font-editorial font-semibold text-sm tracking-widest mb-3">
+          THC
         </div>
-        <p className="text-xs text-slate-500 font-medium">Verifying employee access...</p>
+        <p className="text-xs text-[#78716C] font-medium">Opening studio workspace...</p>
       </div>
     );
   }

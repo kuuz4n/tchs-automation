@@ -214,27 +214,33 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* Toast Notification */}
       {notification && (
-        <div className="fixed top-20 right-6 z-50 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl border border-slate-700 text-xs flex items-center gap-2 animate-in slide-in-from-top-4">
-          <Check className="w-4 h-4 text-emerald-400" />
+        <div className="fixed top-20 right-6 z-50 bg-[#1C1917] text-[#FAF7F2] px-4 py-3 rounded-lg shadow-xl border border-[#3D3732] text-xs flex items-center gap-2.5 animate-in slide-in-from-top-4">
+          <span className="w-2 h-2 rounded-full bg-[#68B684]" />
           <span>{notification}</span>
         </div>
       )}
 
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-slate-200">
+      {/* Editorial Header */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-6 border-b border-[#E5DFD3]">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2.5">
-            <Settings className="w-6 h-6 text-teal-700" />
-            User Profile, Signatures & Invoicing Settings
+          <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#8B4A2B]">
+            Studio Administration &amp; Identity
+          </span>
+          <h1 className="font-editorial text-2xl sm:text-3xl font-semibold text-[#1C1917] mt-1 tracking-tight">
+            Staff Signatures &amp; Studio Branding
           </h1>
-          <p className="text-sm text-slate-500 mt-1">
-            Logged in as: <strong className="text-slate-800">{activeSessionUser?.fullName}</strong>{' '}
+          <p className="text-xs text-[#78716C] mt-1 flex items-center gap-2 flex-wrap">
+            <span>
+              Signed in as <strong className="text-[#1C1917]">{activeSessionUser?.fullName}</strong>
+            </span>
             <span
-              className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${
-                isAdmin ? 'bg-amber-100 text-amber-800 border border-amber-300' : 'bg-slate-100 text-slate-600'
+              className={`text-[10px] px-2 py-0.5 rounded font-semibold uppercase tracking-wider ${
+                isAdmin
+                  ? 'bg-[#F7EFE1] text-[#8B4A2B] border border-[#E2CFAF]'
+                  : 'bg-[#EFECE4] text-[#57534E]'
               }`}
             >
               {activeSessionUser?.role === 'admin' ? 'Administrator' : 'Sales Representative'}
@@ -246,36 +252,38 @@ export default function SettingsPage() {
           <button
             type="button"
             onClick={() => setShowAdminNewUserModal(true)}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-teal-700 hover:bg-teal-800 text-white text-xs font-semibold shadow-xs"
+            className="flex items-center gap-1.5 px-4 py-2.5 rounded-lg bg-[#1C1917] hover:bg-[#8B4A2B] text-[#FAF7F2] text-xs font-medium transition-colors cursor-pointer shrink-0"
           >
-            <Plus className="w-4 h-4" />
-            Provision New Staff Account
+            <Plus className="w-3.5 h-3.5" />
+            Provision Staff Account
           </button>
         )}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* ================= LEFT: USER PROFILES & SIGNATURES ================= */}
-        <div className="lg:col-span-7 bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-6">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-            <div>
-              <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                <User className="w-4 h-4 text-teal-700" />
-                Staff Credentials & Digital Signature
-              </h2>
-              <p className="text-xs text-slate-500 mt-0.5">
-                {isAdmin
-                  ? 'As an Administrator, you can manage and edit any staff profile.'
-                  : 'Update your personal profile, email signature, and drawn signature stamp.'}
-              </p>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {/* ================= LEFT: USER PROFILES & SIGNATURES (7 Cols) ================= */}
+        <div className="lg:col-span-7 bg-[#FFFDF9] rounded-xl border border-[#E5DFD3] p-6 space-y-6">
+          <div className="flex items-baseline justify-between pb-4 border-b border-[#EFECE4]">
+            <div className="flex items-baseline gap-3">
+              <span className="font-num text-xs font-semibold text-[#8B4A2B]">01</span>
+              <div>
+                <h2 className="font-editorial text-lg font-semibold text-[#1C1917]">
+                  Staff Credentials &amp; Digital Signature Stamp
+                </h2>
+                <p className="text-[11px] text-[#78716C]">
+                  {isAdmin
+                    ? 'Administrator view: select any staff member below to update their profile or signature stamp.'
+                    : 'Configure your personal signatory details and drawn signature for official sales invoices.'}
+                </p>
+              </div>
             </div>
           </div>
 
           {/* User selector chips (Visible for Admin to switch between staff profiles) */}
           {isAdmin && (
-            <div>
-              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-2">
-                Manage Staff Member:
+            <div className="bg-[#FAF8F4] p-3.5 rounded-lg border border-[#E5DFD3]">
+              <span className="text-[10px] font-semibold text-[#78716C] uppercase tracking-[0.14em] block mb-2">
+                Select Staff Profile to Edit
               </span>
               <div className="flex flex-wrap gap-2">
                 {users.map((u) => (
@@ -283,21 +291,21 @@ export default function SettingsPage() {
                     key={u.id}
                     type="button"
                     onClick={() => handleSelectUser(u.id)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all ${
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium flex items-center gap-2 transition-all cursor-pointer border ${
                       u.id === selectedUserId
-                        ? 'bg-teal-700 text-white shadow-xs'
-                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                        ? 'bg-[#1C1917] text-[#FAF7F2] border-[#1C1917]'
+                        : 'bg-white text-[#292524] border-[#D6CFC2] hover:bg-[#EFECE4]'
                     }`}
                   >
                     <span>{u.fullName}</span>
                     <span
-                      className={`text-[10px] px-1.5 py-0.2 rounded ${
+                      className={`text-[9px] uppercase tracking-wider px-1.5 py-0.2 rounded ${
                         u.id === selectedUserId
-                          ? 'bg-teal-800 text-teal-100'
-                          : 'bg-slate-200 text-slate-500'
+                          ? 'bg-[#2E2925] text-[#DFC9A6]'
+                          : 'bg-[#F5F2EB] text-[#78716C]'
                       }`}
                     >
-                      {u.role === 'admin' ? 'Admin' : 'Sales'}
+                      {u.role === 'admin' ? 'Admin' : 'Staff'}
                     </span>
                   </button>
                 ))}
@@ -307,98 +315,102 @@ export default function SettingsPage() {
 
           {/* Edit form */}
           <form onSubmit={handleSaveUserProfile} className="space-y-4 text-xs">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="font-semibold text-slate-700">Full Name</label>
+                <label className="font-medium text-[#292524] block mb-1.5">Full Name</label>
                 <input
                   type="text"
                   required
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  className="mt-1 w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-teal-600"
+                  className="w-full px-3.5 py-2 border border-[#D6CFC2] rounded-lg text-sm bg-white text-[#1C1917]"
                 />
               </div>
 
               <div>
-                <label className="font-semibold text-slate-700">Job Title / Designation</label>
+                <label className="font-medium text-[#292524] block mb-1.5">
+                  Job Title / Designation
+                </label>
                 <input
                   type="text"
                   required
                   value={jobTitle}
                   onChange={(e) => setJobTitle(e.target.value)}
                   placeholder="e.g. Senior Event Account Executive"
-                  className="mt-1 w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-teal-600"
+                  className="w-full px-3.5 py-2 border border-[#D6CFC2] rounded-lg text-sm bg-white text-[#1C1917]"
                 />
               </div>
 
               <div>
-                <label className="font-semibold text-slate-700">Company Email</label>
+                <label className="font-medium text-[#292524] block mb-1.5">Work Email</label>
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="mt-1 w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-teal-600"
+                  className="w-full px-3.5 py-2 border border-[#D6CFC2] rounded-lg text-sm bg-white text-[#1C1917]"
                 />
               </div>
 
               <div>
-                <label className="font-semibold text-slate-700">Phone Number</label>
+                <label className="font-medium text-[#292524] block mb-1.5">Contact Number</label>
                 <input
                   type="text"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  className="mt-1 w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-teal-600"
+                  className="w-full px-3.5 py-2 border border-[#D6CFC2] rounded-lg text-sm bg-white text-[#1C1917]"
                 />
               </div>
 
               {isAdmin && (
                 <div>
-                  <label className="font-semibold text-slate-700">System Role</label>
+                  <label className="font-medium text-[#292524] block mb-1.5">Access Role</label>
                   <select
                     value={role}
                     onChange={(e) => setRole(e.target.value as 'admin' | 'sales_rep')}
-                    className="mt-1 w-full px-3 py-2 border border-slate-300 rounded-lg text-xs bg-white font-medium"
+                    className="w-full px-3 py-2 border border-[#D6CFC2] rounded-lg text-xs bg-white font-medium text-[#1C1917]"
                   >
                     <option value="sales_rep">Sales Representative</option>
-                    <option value="admin">Administrator (Can create staff)</option>
+                    <option value="admin">Administrator (Full Studio Controls)</option>
                   </select>
                 </div>
               )}
             </div>
 
             <div>
-              <label className="font-semibold text-slate-700">Email Signature Block</label>
+              <label className="font-medium text-[#292524] block mb-1.5">
+                Signatory Footer Note
+              </label>
               <textarea
                 rows={3}
                 value={emailSignatureHtml}
                 onChange={(e) => setEmailSignatureHtml(e.target.value)}
                 placeholder="Warm regards,&#10;Juan Dela Cruz&#10;Senior Event Account Executive | The Happy Club"
-                className="mt-1 w-full px-3 py-2 font-mono text-xs border border-slate-300 rounded-lg focus:outline-teal-600"
+                className="w-full px-3.5 py-2 font-mono text-xs border border-[#D6CFC2] rounded-lg bg-white text-[#1C1917]"
               />
-              <p className="text-[11px] text-slate-400 mt-0.5">
-                Automatically rendered on sales invoices & quotes issued by this user.
+              <p className="text-[11px] text-[#78716C] mt-1">
+                Printed on the signatory block of proposals and invoices issued under your account.
               </p>
             </div>
 
             {/* Digital Signature Drawing / Upload Canvas */}
-            <div className="pt-2 border-t border-slate-100 space-y-2">
+            <div className="pt-4 border-t border-[#EFECE4] space-y-3">
               <div className="flex items-center justify-between">
-                <label className="font-bold text-slate-800 flex items-center gap-1.5">
-                  <PenTool className="w-3.5 h-3.5 text-teal-700" />
+                <label className="font-semibold text-[#1C1917] flex items-center gap-1.5">
+                  <PenTool className="w-3.5 h-3.5 text-[#8B4A2B]" />
                   Digital Signature Stamp
                 </label>
                 <button
                   type="button"
                   onClick={clearCanvas}
-                  className="text-[11px] text-rose-600 hover:text-rose-800 flex items-center gap-1"
+                  className="text-[11px] text-[#9E3B33] hover:underline flex items-center gap-1 cursor-pointer"
                 >
-                  <RotateCcw className="w-3 h-3" /> Clear Signature
+                  <RotateCcw className="w-3 h-3" /> Clear Pad
                 </button>
               </div>
 
               {/* Draw Pad */}
-              <div className="border-2 border-dashed border-slate-300 rounded-xl bg-slate-50 p-2 flex flex-col items-center">
+              <div className="border border-dashed border-[#C8B9A6] rounded-xl bg-[#FAF8F4] p-4 flex flex-col items-center">
                 <canvas
                   ref={canvasRef}
                   width={340}
@@ -407,18 +419,18 @@ export default function SettingsPage() {
                   onMouseMove={draw}
                   onMouseUp={stopDrawing}
                   onMouseLeave={stopDrawing}
-                  className="bg-white rounded-lg shadow-xs cursor-crosshair border border-slate-200"
+                  className="bg-white rounded-lg cursor-crosshair border border-[#E5DFD3]"
                 />
-                <p className="text-[10px] text-slate-400 mt-1">
-                  ✍️ Draw your signature above using mouse, touch, or stylus.
+                <p className="text-[11px] text-[#78716C] mt-2">
+                  Sign above using mouse or stylus, or upload a transparent PNG signature below.
                 </p>
               </div>
 
               {/* Or file upload */}
-              <div className="flex items-center gap-2 pt-1">
-                <label className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-300 text-slate-700 bg-white hover:bg-slate-50 cursor-pointer text-xs font-medium">
-                  <Upload className="w-3.5 h-3.5 text-slate-500" />
-                  Upload Signature PNG / Image
+              <div className="flex items-center gap-3 pt-1">
+                <label className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border border-[#D6CFC2] text-[#1C1917] bg-white hover:bg-[#FAF8F4] cursor-pointer text-xs font-medium transition-colors">
+                  <Upload className="w-3.5 h-3.5 text-[#8B4A2B]" />
+                  Upload Transparent PNG
                   <input
                     type="file"
                     accept="image/*"
@@ -428,8 +440,8 @@ export default function SettingsPage() {
                 </label>
 
                 {signatureImageUrl && (
-                  <span className="text-[11px] text-emerald-700 font-medium flex items-center gap-1">
-                    <Check className="w-3.5 h-3.5" /> Signature Saved
+                  <span className="text-[11px] text-[#2E5A44] font-medium flex items-center gap-1">
+                    <Check className="w-3.5 h-3.5" /> Signature Stamp Active
                   </span>
                 )}
               </div>
@@ -438,31 +450,33 @@ export default function SettingsPage() {
             <div className="pt-3 flex justify-end">
               <button
                 type="submit"
-                className="px-5 py-2.5 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-semibold text-xs shadow-xs"
+                className="px-5 py-2.5 rounded-lg bg-[#1C1917] hover:bg-[#8B4A2B] text-[#FAF7F2] font-medium text-xs transition-colors cursor-pointer"
               >
-                Save Profile & Signature
+                Save Profile &amp; Signature
               </button>
             </div>
           </form>
         </div>
 
-        {/* ================= RIGHT: CANVA BRANDING & BANKING ================= */}
+        {/* ================= RIGHT: CANVA BRANDING & BANKING (5 Cols) ================= */}
         {themeConfig && (
-          <div className="lg:col-span-5 bg-white rounded-2xl border border-slate-200 shadow-xs p-6 space-y-6">
-            <div className="pb-3 border-b border-slate-100">
-              <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                <Building className="w-4 h-4 text-teal-700" />
-                Canva Branding & Invoicing Details
-              </h2>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Customize titles, bank accounts, and disclaimers
-              </p>
+          <div className="lg:col-span-5 bg-[#FFFDF9] rounded-xl border border-[#E5DFD3] p-6 space-y-6">
+            <div className="flex items-baseline gap-3 pb-4 border-b border-[#EFECE4]">
+              <span className="font-num text-xs font-semibold text-[#8B4A2B]">02</span>
+              <div>
+                <h2 className="font-editorial text-lg font-semibold text-[#1C1917]">
+                  Studio Letterhead &amp; Remittance
+                </h2>
+                <p className="text-[11px] text-[#78716C]">
+                  Company masthead, address, and settlement accounts shown on PDFs.
+                </p>
+              </div>
             </div>
 
             <form onSubmit={handleSaveTheme} className="space-y-4 text-xs">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="font-semibold text-slate-700">Brand Name</label>
+                  <label className="font-medium text-[#292524] block mb-1.5">Primary Brand</label>
                   <input
                     type="text"
                     value={themeConfig.brandName}
@@ -470,11 +484,13 @@ export default function SettingsPage() {
                     onChange={(e) =>
                       setThemeConfig({ ...themeConfig, brandName: e.target.value })
                     }
-                    className="mt-1 w-full px-3 py-2 border border-slate-300 rounded-lg text-sm disabled:bg-slate-100"
+                    className="w-full px-3 py-2 border border-[#D6CFC2] rounded-lg text-sm bg-white disabled:bg-[#F5F2EB] text-[#1C1917]"
                   />
                 </div>
                 <div>
-                  <label className="font-semibold text-slate-700">Sub-Brand (Cursive)</label>
+                  <label className="font-medium text-[#292524] block mb-1.5">
+                    Script Sub-Brand
+                  </label>
                   <input
                     type="text"
                     value={themeConfig.subBrandName}
@@ -482,13 +498,13 @@ export default function SettingsPage() {
                     onChange={(e) =>
                       setThemeConfig({ ...themeConfig, subBrandName: e.target.value })
                     }
-                    className="mt-1 w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-serif italic disabled:bg-slate-100"
+                    className="w-full px-3 py-2 border border-[#D6CFC2] rounded-lg text-sm font-editorial italic bg-white disabled:bg-[#F5F2EB] text-[#1C1917]"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="font-semibold text-slate-700">Company Address</label>
+                <label className="font-medium text-[#292524] block mb-1.5">Studio Address</label>
                 <input
                   type="text"
                   value={themeConfig.companyAddress}
@@ -496,13 +512,15 @@ export default function SettingsPage() {
                   onChange={(e) =>
                     setThemeConfig({ ...themeConfig, companyAddress: e.target.value })
                   }
-                  className="mt-1 w-full px-3 py-2 border border-slate-300 rounded-lg text-xs disabled:bg-slate-100"
+                  className="w-full px-3.5 py-2 border border-[#D6CFC2] rounded-lg text-xs bg-white disabled:bg-[#F5F2EB] text-[#1C1917]"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="font-semibold text-slate-700">Contact Number(s)</label>
+                  <label className="font-medium text-[#292524] block mb-1.5">
+                    Contact Number(s)
+                  </label>
                   <input
                     type="text"
                     value={themeConfig.companyContact}
@@ -510,11 +528,11 @@ export default function SettingsPage() {
                     onChange={(e) =>
                       setThemeConfig({ ...themeConfig, companyContact: e.target.value })
                     }
-                    className="mt-1 w-full px-3 py-2 border border-slate-300 rounded-lg text-xs disabled:bg-slate-100"
+                    className="w-full px-3 py-2 border border-[#D6CFC2] rounded-lg text-xs bg-white disabled:bg-[#F5F2EB] text-[#1C1917]"
                   />
                 </div>
                 <div>
-                  <label className="font-semibold text-slate-700">Official Email</label>
+                  <label className="font-medium text-[#292524] block mb-1.5">Official Email</label>
                   <input
                     type="text"
                     value={themeConfig.companyEmail}
@@ -522,24 +540,24 @@ export default function SettingsPage() {
                     onChange={(e) =>
                       setThemeConfig({ ...themeConfig, companyEmail: e.target.value })
                     }
-                    className="mt-1 w-full px-3 py-2 border border-slate-300 rounded-lg text-xs disabled:bg-slate-100"
+                    className="w-full px-3 py-2 border border-[#D6CFC2] rounded-lg text-xs bg-white disabled:bg-[#F5F2EB] text-[#1C1917]"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="font-semibold text-slate-700 flex items-center gap-1.5">
-                  <CreditCard className="w-3.5 h-3.5 text-teal-700" />
-                  Bank Account / GCash Payment Details
+                <label className="font-medium text-[#292524] flex items-center gap-1.5 mb-1.5">
+                  <CreditCard className="w-3.5 h-3.5 text-[#8B4A2B]" />
+                  Bank &amp; GCash Remittance Details
                 </label>
                 <textarea
-                  rows={3}
+                  rows={4}
                   value={themeConfig.bankAccountInfo}
                   disabled={!isAdmin}
                   onChange={(e) =>
                     setThemeConfig({ ...themeConfig, bankAccountInfo: e.target.value })
                   }
-                  className="mt-1 w-full px-3 py-2 font-mono text-xs border border-slate-300 rounded-lg disabled:bg-slate-100"
+                  className="w-full px-3.5 py-2 font-mono text-xs border border-[#D6CFC2] rounded-lg bg-white disabled:bg-[#F5F2EB] text-[#1C1917]"
                 />
               </div>
 
@@ -547,9 +565,9 @@ export default function SettingsPage() {
                 <div className="pt-2 flex justify-end">
                   <button
                     type="submit"
-                    className="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs shadow-xs"
+                    className="px-5 py-2.5 rounded-lg bg-[#1C1917] hover:bg-[#8B4A2B] text-[#FAF7F2] font-medium text-xs transition-colors cursor-pointer"
                   >
-                    Save Branding Settings
+                    Save Studio Branding
                   </button>
                 </div>
               )}
@@ -560,89 +578,91 @@ export default function SettingsPage() {
 
       {/* Admin Only Modal: Create Staff Account */}
       {showAdminNewUserModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-[2px]">
+          <div className="bg-[#FFFDF9] border border-[#DED8CC] rounded-xl max-w-md w-full p-6 shadow-2xl relative">
             <button
               type="button"
               onClick={() => setShowAdminNewUserModal(false)}
-              className="absolute top-5 right-5 text-slate-400 hover:text-slate-600"
+              className="absolute top-5 right-5 text-[#78716C] hover:text-[#1C1917] cursor-pointer"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
 
-            <div className="flex items-center gap-2 mb-2">
-              <ShieldCheck className="w-5 h-5 text-teal-700" />
-              <h3 className="text-base font-bold text-slate-900">Provision New Staff Account</h3>
-            </div>
-            <p className="text-xs text-slate-500 mb-4">
-              Admin privilege: Create a company login for an employee.
+            <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#8B4A2B]">
+              Administrator Action
+            </span>
+            <h3 className="font-editorial text-xl font-semibold text-[#1C1917] mt-0.5">
+              Provision Staff Account
+            </h3>
+            <p className="text-xs text-[#78716C] mt-1 mb-4">
+              Create a new Supabase login and staff profile without signing out of your session.
             </p>
 
             {adminModalError && (
-              <div className="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs">
+              <div className="mb-4 p-3 rounded-lg bg-[#FBECEB] border border-[#E8C5C3] text-[#8C2D27] text-xs">
                 {adminModalError}
               </div>
             )}
 
             <form onSubmit={handleAdminCreateStaff} className="space-y-3.5 text-xs">
               <div>
-                <label className="font-semibold text-slate-700 block mb-1">Employee Full Name</label>
+                <label className="font-medium text-[#292524] block mb-1">Employee Full Name</label>
                 <input
                   type="text"
                   required
                   value={newStaffName}
                   onChange={(e) => setNewStaffName(e.target.value)}
                   placeholder="e.g. Christine Reyes"
-                  className="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm"
+                  className="w-full px-3.5 py-2 border border-[#D6CFC2] rounded-lg text-sm bg-white"
                 />
               </div>
 
               <div>
-                <label className="font-semibold text-slate-700 block mb-1">Job Title</label>
+                <label className="font-medium text-[#292524] block mb-1">Job Title</label>
                 <input
                   type="text"
                   required
                   value={newStaffTitle}
                   onChange={(e) => setNewStaffTitle(e.target.value)}
                   placeholder="e.g. Senior Events Specialist"
-                  className="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm"
+                  className="w-full px-3.5 py-2 border border-[#D6CFC2] rounded-lg text-sm bg-white"
                 />
               </div>
 
               <div>
-                <label className="font-semibold text-slate-700 block mb-1">Company Email</label>
+                <label className="font-medium text-[#292524] block mb-1">Work Email</label>
                 <input
                   type="email"
                   required
                   value={newStaffEmail}
                   onChange={(e) => setNewStaffEmail(e.target.value)}
                   placeholder="name@thehappyclub.com"
-                  className="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm"
+                  className="w-full px-3.5 py-2 border border-[#D6CFC2] rounded-lg text-sm bg-white"
                 />
               </div>
 
               <div>
-                <label className="font-semibold text-slate-700 block mb-1">Initial Password</label>
+                <label className="font-medium text-[#292524] block mb-1">Initial Password</label>
                 <input
                   type="password"
                   required
-                  minLength={4}
+                  minLength={6}
                   value={newStaffPassword}
                   onChange={(e) => setNewStaffPassword(e.target.value)}
-                  placeholder="Minimum 4 characters"
-                  className="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm"
+                  placeholder="Minimum 6 characters"
+                  className="w-full px-3.5 py-2 border border-[#D6CFC2] rounded-lg text-sm bg-white"
                 />
               </div>
 
               <div>
-                <label className="font-semibold text-slate-700 block mb-1">Access Role</label>
+                <label className="font-medium text-[#292524] block mb-1">Access Role</label>
                 <select
                   value={newStaffRole}
                   onChange={(e) => setNewStaffRole(e.target.value as 'sales_rep' | 'admin')}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs bg-white font-medium"
+                  className="w-full px-3 py-2 border border-[#D6CFC2] rounded-lg text-xs bg-white font-medium"
                 >
                   <option value="sales_rep">Sales Representative (Standard Staff)</option>
-                  <option value="admin">Administrator (Full Admin Controls)</option>
+                  <option value="admin">Administrator (Full Studio Controls)</option>
                 </select>
               </div>
 
@@ -650,13 +670,13 @@ export default function SettingsPage() {
                 <button
                   type="button"
                   onClick={() => setShowAdminNewUserModal(false)}
-                  className="px-4 py-2 text-xs text-slate-600 hover:bg-slate-100 rounded-xl"
+                  className="px-4 py-2 text-xs text-[#57534E] hover:bg-[#EFECE4] rounded-lg cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-xs bg-teal-700 hover:bg-teal-800 text-white font-bold rounded-xl shadow-xs"
+                  className="px-4 py-2 text-xs bg-[#1C1917] hover:bg-[#8B4A2B] text-[#FAF7F2] font-medium rounded-lg transition-colors cursor-pointer"
                 >
                   Create Staff Account
                 </button>

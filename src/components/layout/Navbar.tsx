@@ -50,57 +50,58 @@ export default function Navbar() {
   };
 
   const navLinks = [
-    { name: 'Proposals', href: '/', icon: FileText },
-    { name: 'Invoices', href: '/invoices', icon: Receipt },
-    { name: 'Service Catalog', href: '/catalog', icon: Layers },
-    { name: 'Branding & Profile', href: '/settings', icon: Settings },
+    { name: 'Quotation Desk', href: '/' },
+    { name: 'Sales Invoices', href: '/invoices' },
+    { name: 'Service Catalog', href: '/catalog' },
+    { name: 'Studio & Signatures', href: '/settings' },
   ];
 
   return (
-    <header className="no-print sticky top-0 z-40 bg-white border-b border-slate-200 shadow-xs">
+    <header className="no-print sticky top-0 z-40 bg-[#FAF8F4]/95 backdrop-blur-md border-b border-[#E5DFD3]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo / Brand */}
-          <div className="flex items-center gap-3">
-            <Link href="/" className="flex items-center gap-2.5">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-teal-700 via-teal-600 to-emerald-500 flex items-center justify-center text-white shadow-sm font-bold text-lg">
+          {/* Brand Monogram & Studio Name */}
+          <div className="flex items-center gap-8">
+            <Link href="/" className="flex items-center gap-3 group">
+              <div className="w-9 h-9 rounded-lg bg-[#1C1917] border border-[#3A332C] flex items-center justify-center text-[#F3EDE2] font-editorial font-semibold text-sm tracking-widest shadow-2xs group-hover:bg-[#8B4A2B] transition-colors">
                 THC
               </div>
-              <div>
-                <span className="font-bold text-slate-900 tracking-tight text-base sm:text-lg block leading-tight">
-                  The Happy Club
+              <div className="flex flex-col">
+                <span className="font-editorial font-semibold text-[#1C1917] text-base sm:text-lg leading-none tracking-tight">
+                  The Happy Club Studios
                 </span>
-                <span className="text-xs text-teal-700 font-medium tracking-wide uppercase">
-                  Proposal & Invoice Engine
+                <span className="text-[10px] text-[#78716C] font-medium tracking-[0.16em] uppercase mt-1">
+                  Quotation &amp; Billing Desk
                 </span>
               </div>
             </Link>
-          </div>
 
-          {/* Desktop Navigation */}
-          {currentUser && (
-            <nav className="hidden md:flex items-center gap-1">
-              {navLinks.map((link) => {
-                const Icon = link.icon;
-                const isActive =
-                  link.href === '/' ? pathname === '/' : pathname.startsWith(link.href);
-                return (
-                  <Link
-                    key={link.name}
-                    href={link.href}
-                    className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      isActive
-                        ? 'bg-teal-50 text-teal-800 font-semibold'
-                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
-                    }`}
-                  >
-                    <Icon className={`w-4 h-4 ${isActive ? 'text-teal-700' : 'text-slate-500'}`} />
-                    {link.name}
-                  </Link>
-                );
-              })}
-            </nav>
-          )}
+            {/* Desktop Navigation */}
+            {currentUser && (
+              <nav className="hidden md:flex items-center gap-1 border-l border-[#E5DFD3] pl-6">
+                {navLinks.map((link) => {
+                  const isActive =
+                    link.href === '/' ? pathname === '/' : pathname.startsWith(link.href);
+                  return (
+                    <Link
+                      key={link.name}
+                      href={link.href}
+                      className={`relative px-3.5 py-2 rounded-md text-xs font-medium tracking-wide transition-colors ${
+                        isActive
+                          ? 'text-[#1C1917] font-semibold bg-[#EFECE4]'
+                          : 'text-[#68625D] hover:text-[#1C1917] hover:bg-[#F3F0E8]'
+                      }`}
+                    >
+                      {link.name}
+                      {isActive && (
+                        <span className="absolute bottom-0 left-3.5 right-3.5 h-[2px] bg-[#8B4A2B] rounded-full" />
+                      )}
+                    </Link>
+                  );
+                })}
+              </nav>
+            )}
+          </div>
 
           {/* Right Actions: Authenticated Staff Profile & Sign Out */}
           <div className="flex items-center gap-3">
@@ -109,31 +110,33 @@ export default function Navbar() {
                 <button
                   type="button"
                   onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-xs text-left transition-colors"
+                  className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg border border-[#E5DFD3] bg-[#FFFDF9] hover:bg-[#F3F0E8] text-xs text-left transition-colors cursor-pointer"
                 >
-                  <div className="w-7 h-7 rounded-full bg-teal-700 text-white flex items-center justify-center font-bold text-xs">
-                    {currentUser.fullName?.charAt(0) || 'U'}
+                  <div className="w-6 h-6 rounded-full bg-[#292524] text-[#F5F2EB] flex items-center justify-center font-editorial font-semibold text-xs">
+                    {currentUser.fullName?.charAt(0) || 'S'}
                   </div>
                   <div className="hidden sm:block">
-                    <div className="font-semibold text-slate-800 leading-none">
+                    <div className="font-semibold text-[#1C1917] leading-none text-xs">
                       {currentUser.fullName}
                     </div>
-                    <div className="text-[10px] text-slate-500 mt-0.5 leading-none">
-                      {currentUser.role === 'admin' ? 'Administrator' : currentUser.jobTitle}
+                    <div className="text-[10px] text-[#78716C] mt-0.5 leading-none">
+                      {currentUser.role === 'admin' ? 'Studio Admin' : currentUser.jobTitle}
                     </div>
                   </div>
-                  <ChevronDown className="w-3.5 h-3.5 text-slate-400 ml-1" />
+                  <ChevronDown className="w-3.5 h-3.5 text-[#78716C] ml-0.5" />
                 </button>
 
                 {userDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-slate-200 py-2 z-50 animate-in fade-in zoom-in-95">
-                    <div className="px-4 py-2 border-b border-slate-100">
-                      <p className="text-xs font-bold text-slate-900 leading-tight">
+                  <div className="absolute right-0 mt-2 w-60 bg-[#FFFDF9] rounded-xl shadow-lg border border-[#E5DFD3] py-1.5 z-50">
+                    <div className="px-4 py-2.5 border-b border-[#EFECE4]">
+                      <p className="text-xs font-semibold text-[#1C1917] leading-tight">
                         {currentUser.fullName}
                       </p>
-                      <p className="text-[11px] text-slate-500">{currentUser.email}</p>
-                      <span className="inline-block mt-1 text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-teal-50 text-teal-800 border border-teal-200">
-                        {currentUser.role === 'admin' ? 'Administrator' : 'Staff Member'}
+                      <p className="text-[11px] text-[#78716C] mt-0.5 truncate">
+                        {currentUser.email}
+                      </p>
+                      <span className="inline-block mt-1.5 text-[9px] font-semibold uppercase tracking-[0.12em] px-2 py-0.5 rounded bg-[#F3EFE6] text-[#57534E] border border-[#E5DFD3]">
+                        {currentUser.role === 'admin' ? 'Administrator' : 'Staff Account'}
                       </span>
                     </div>
 
@@ -141,18 +144,18 @@ export default function Navbar() {
                       <Link
                         href="/settings"
                         onClick={() => setUserDropdownOpen(false)}
-                        className="w-full px-4 py-2 text-left text-xs text-slate-700 hover:bg-slate-50 flex items-center gap-2 transition-colors"
+                        className="w-full px-4 py-2 text-left text-xs text-[#292524] hover:bg-[#F5F2EB] flex items-center gap-2 transition-colors"
                       >
-                        <Sparkles className="w-3.5 h-3.5 text-teal-600" />
-                        My Profile & Signature
+                        <User className="w-3.5 h-3.5 text-[#8B4A2B]" />
+                        Signature &amp; Studio Settings
                       </Link>
                     </div>
 
-                    <div className="border-t border-slate-100 pt-1">
+                    <div className="border-t border-[#EFECE4] pt-1">
                       <button
                         type="button"
                         onClick={handleLogout}
-                        className="w-full px-4 py-2 text-left text-xs text-rose-600 hover:bg-rose-50 flex items-center gap-2 font-medium transition-colors"
+                        className="w-full px-4 py-2 text-left text-xs text-[#9E3B33] hover:bg-[#FBECEB]/60 flex items-center gap-2 font-medium transition-colors cursor-pointer"
                       >
                         <LogOut className="w-3.5 h-3.5" />
                         Sign Out
@@ -164,32 +167,32 @@ export default function Navbar() {
             ) : (
               <Link
                 href="/login"
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-teal-700 text-white text-xs font-semibold hover:bg-teal-800 shadow-xs"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#1C1917] text-[#F5F2EB] text-xs font-medium hover:bg-[#292524] transition-colors"
               >
                 <LogIn className="w-3.5 h-3.5" />
-                Sign In
+                Staff Sign In
               </Link>
             )}
           </div>
         </div>
       </div>
 
-      {/* Mobile nav (Only when logged in) */}
+      {/* Mobile navigation strip */}
       {currentUser && (
-        <div className="md:hidden flex overflow-x-auto border-t border-slate-200 px-2 py-1.5 gap-1 bg-slate-50/70">
+        <div className="md:hidden flex overflow-x-auto border-t border-[#E5DFD3] px-3 py-2 gap-1.5 bg-[#F5F2EB]">
           {navLinks.map((link) => {
-            const Icon = link.icon;
             const isActive =
               link.href === '/' ? pathname === '/' : pathname.startsWith(link.href);
             return (
               <Link
                 key={link.name}
                 href={link.href}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap ${
-                  isActive ? 'bg-teal-700 text-white font-semibold' : 'text-slate-600 hover:bg-slate-200'
+                className={`px-3 py-1.5 rounded-md text-xs font-medium whitespace-nowrap transition-colors ${
+                  isActive
+                    ? 'bg-[#1C1917] text-[#F5F2EB] font-semibold'
+                    : 'text-[#57534E] hover:bg-[#E5DFD3]/60'
                 }`}
               >
-                <Icon className="w-3.5 h-3.5" />
                 {link.name}
               </Link>
             );
