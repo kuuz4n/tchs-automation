@@ -15,7 +15,13 @@ import {
   Calendar,
   DollarSign,
 } from 'lucide-react';
-import { getInvoices, deleteInvoice, saveInvoice, getCurrentUser } from '@/lib/storage';
+import {
+  getInvoices,
+  syncInvoicesFromCloud,
+  deleteInvoice,
+  saveInvoice,
+  getCurrentUser,
+} from '@/lib/storage';
 import { Invoice, UserProfile } from '@/types';
 import CanvaDocumentView from '@/components/invoice/CanvaDocumentView';
 
@@ -26,12 +32,20 @@ export default function InvoicesPage() {
   const [showViewModal, setShowViewModal] = useState(false);
 
   useEffect(() => {
-    refresh();
+    refresh(true);
   }, []);
 
-  const refresh = () => {
+  const refresh = async (syncCloud = false) => {
     setInvoices(getInvoices());
     setCurrentUser(getCurrentUser());
+    if (syncCloud) {
+      try {
+        const cloudInvs = await syncInvoicesFromCloud();
+        setInvoices(cloudInvs);
+      } catch (e) {
+        console.warn('Invoice cloud sync warning:', e);
+      }
+    }
   };
 
   const handleDelete = (id: string, num: string) => {

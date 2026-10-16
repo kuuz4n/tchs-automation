@@ -113,7 +113,7 @@ create table if not exists public.location_zones (
 
 -- 8. PROPOSALS
 create table if not exists public.proposals (
-  id uuid primary key default uuid_generate_v4(),
+  id text primary key,
   proposal_number text unique not null,
   client jsonb not null default '{}'::jsonb,
   created_by uuid references public.profiles(id) on delete set null,
@@ -130,9 +130,9 @@ create table if not exists public.proposals (
 
 -- 9. INVOICES
 create table if not exists public.invoices (
-  id uuid primary key default uuid_generate_v4(),
+  id text primary key,
   invoice_number text unique not null,
-  proposal_id uuid references public.proposals(id) on delete set null,
+  proposal_id text references public.proposals(id) on delete set null,
   proposal_number text,
   client jsonb not null default '{}'::jsonb,
   issued_by uuid references public.profiles(id) on delete set null,
@@ -173,6 +173,7 @@ create policy "Allow authenticated staff write access to packages" on public.ser
 create policy "Allow public read access to addons" on public.addons for select using (true);
 create policy "Allow authenticated staff write access to addons" on public.addons for all to authenticated using (true);
 create policy "Allow public read access to location zones" on public.location_zones for select using (true);
+create policy "Allow authenticated staff write access to location zones" on public.location_zones for all to authenticated using (true);
 create policy "Allow authenticated staff full access to proposals" on public.proposals for all to authenticated using (true);
 create policy "Allow authenticated staff full access to invoices" on public.invoices for all to authenticated using (true);
 

@@ -8,29 +8,47 @@ import {
   Edit2,
   Check,
   X,
-  ChevronRight,
-  Sparkles,
-  HelpCircle,
-  Package,
-  Sliders,
+  MapPin,
+  Calendar,
 } from 'lucide-react';
 import {
   getCategories,
+  syncCategoriesFromCloud,
   saveCategory,
   deleteCategory,
   getPackages,
+  syncPackagesFromCloud,
   savePackage,
   deletePackage,
   getAddons,
+  syncAddonsFromCloud,
   saveAddon,
   deleteAddon,
+  getZones,
+  syncZonesFromCloud,
+  saveZone,
+  deleteZone,
+  getEventTypes,
+  saveEventType,
+  updateEventType,
+  deleteEventType,
 } from '@/lib/storage';
-import { ServiceCategory, ServicePackage, Addon, AddonVariant, PricingType, IntervalUnit } from '@/types';
+import {
+  ServiceCategory,
+  ServicePackage,
+  Addon,
+  AddonVariant,
+  PricingType,
+  IntervalUnit,
+  LocationZone,
+} from '@/types';
 
 export default function CatalogPage() {
   const [categories, setCategories] = useState<ServiceCategory[]>([]);
   const [packages, setPackages] = useState<ServicePackage[]>([]);
   const [addons, setAddons] = useState<Addon[]>([]);
+  const [zones, setZones] = useState<LocationZone[]>([]);
+  const [eventTypes, setEventTypes] = useState<string[]>([]);
 
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>('');
   const [selectedPackageId, setSelectedPackageId] = useState<string>('');
@@ -44,11 +62,15 @@ export default function CatalogPage() {
   const [showPackageModal, setShowPackageModal] = useState(false);
   const [editingPackage, setEditingPackage] = useState<ServicePackage | null>(null);
   const [pkgName, setPkgName] = useState('');
+  const [pkgScriptTitle, setPkgScriptTitle] = useState('');
+  const [pkgSubtitle, setPkgSubtitle] = useState('');
+  const [pkgBadgeText, setPkgBadgeText] = useState('');
   const [pkgPrice, setPkgPrice] = useState('15000');
   const [pkgHours, setPkgHours] = useState('2');
   const [pkgPax, setPkgPax] = useState('100');
   const [pkgDesc, setPkgDesc] = useState('');
   const [pkgInclusions, setPkgInclusions] = useState('');
+  const [pkgFreebies, setPkgFreebies] = useState('');
 
   const [showAddonModal, setShowAddonModal] = useState(false);
   const [editingAddon, setEditingAddon] = useState<Addon | null>(null);
@@ -67,21 +89,54 @@ export default function CatalogPage() {
   const [newVariantPrice, setNewVariantPrice] = useState('');
   const [newVariantIsPax, setNewVariantIsPax] = useState(false);
 
+  // Location Zone modal state
+  const [showZoneModal, setShowZoneModal] = useState(false);
+  const [editingZone, setEditingZone] = useState<LocationZone | null>(null);
+  const [zoneName, setZoneName] = useState('');
+  const [zoneFee, setZoneFee] = useState('0');
+  const [zoneDesc, setZoneDesc] = useState('');
+
+  // Event Type modal state
+  const [showEventTypeModal, setShowEventTypeModal] = useState(false);
+  const [editingEventType, setEditingEventType] = useState<string | null>(null);
+  const [eventTypeName, setEventTypeName] = useState('');
+
   useEffect(() => {
-    refreshData();
+    refreshData(true);
   }, []);
 
-  const refreshData = () => {
+  const refreshData = async (syncCloud = false) => {
     const cats = getCategories();
     const pkgs = getPackages();
     const adds = getAddons();
+    const zns = getZones();
+    const evts = getEventTypes();
 
     setCategories(cats);
     setPackages(pkgs);
     setAddons(adds);
+    setZones(zns);
+    setEventTypes(evts);
 
     if (cats.length > 0 && !selectedCategoryId) {
       setSelectedCategoryId(cats[0].id);
+    }
+
+    if (syncCloud) {
+      try {
+        const [cCats, cPkgs, cAdds, cZns] = await Promise.all([
+          syncCategoriesFromCloud(),
+          syncPackagesFromCloud(),
+          syncAddonsFromCloud(),
+          syncZonesFromCloud(),
+        ]);
+        setCategories(cCats);
+        setPackages(cPkgs);
+        setAddons(cAdds);
+        setZones(cZns);
+      } catch (e) {
+        console.warn('Catalog cloud sync warning:', e);
+      }
     }
   };
 
@@ -89,7 +144,10 @@ export default function CatalogPage() {
   const currentPackages = packages.filter((p) => p.categoryId === selectedCategoryId);
 
   useEffect(() => {
-    if (currentPackages.length > 0 && (!selectedPackageId || !currentPackages.find((p) => p.id === selectedPackageId))) {
+    if (
+      currentPackages.length > 0 &&
+      (!selectedPackageId || !currentPackages.find((p) => p.id === selectedPackageId))
+    ) {
       setSelectedPackageId(currentPackages[0].id);
     }
   }, [selectedCategoryId, currentPackages, selectedPackageId]);
@@ -111,7 +169,7 @@ export default function CatalogPage() {
     setShowCategoryModal(true);
   };
 
-  const handleSaveCategory = (e: React.FormEvent) => {
+  const handleSaveCategory = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!catName.trim()) return;
 
@@ -122,15 +180,19 @@ export default function CatalogPage() {
       sortOrder: editingCategory ? editingCategory.sortOrder : categories.length + 1,
       isActive: true,
     };
-    saveCategory(newCat);
+    await saveCategory(newCat);
     setShowCategoryModal(false);
     refreshData();
     setSelectedCategoryId(newCat.id);
   };
 
-  const handleDeleteCategory = (id: string, name: string) => {
-    if (confirm(`Are you sure you want to delete category "${name}" and all its packages and add-ons?`)) {
-      deleteCategory(id);
+  const handleDeleteCategory = async (id: string, name: string) => {
+    if (
+      confirm(
+        `Are you sure you want to delete category "${name}" and all its packages and add-ons?`
+      )
+    ) {
+      await deleteCategory(id);
       refreshData();
       const remaining = categories.filter((c) => c.id !== id);
       if (remaining.length > 0) setSelectedCategoryId(remaining[0].id);
@@ -142,24 +204,32 @@ export default function CatalogPage() {
     if (pkg) {
       setEditingPackage(pkg);
       setPkgName(pkg.name);
+      setPkgScriptTitle(pkg.scriptTitle || '');
+      setPkgSubtitle(pkg.subtitle || '');
+      setPkgBadgeText(pkg.badgeText || '');
       setPkgPrice(pkg.basePrice.toString());
       setPkgHours(pkg.baseHours.toString());
       setPkgPax(pkg.basePax.toString());
       setPkgDesc(pkg.description);
-      setPkgInclusions(pkg.inclusions.join('\n'));
+      setPkgInclusions((pkg.inclusions || []).join('\n'));
+      setPkgFreebies((pkg.freebies || []).join('\n'));
     } else {
       setEditingPackage(null);
       setPkgName('');
+      setPkgScriptTitle('');
+      setPkgSubtitle('');
+      setPkgBadgeText('');
       setPkgPrice('15000');
       setPkgHours('2');
       setPkgPax('100');
       setPkgDesc('');
       setPkgInclusions('');
+      setPkgFreebies('');
     }
     setShowPackageModal(true);
   };
 
-  const handleSavePackage = (e: React.FormEvent) => {
+  const handleSavePackage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!pkgName.trim() || !selectedCategoryId) return;
 
@@ -167,25 +237,34 @@ export default function CatalogPage() {
       id: editingPackage ? editingPackage.id : `pkg-${Date.now()}`,
       categoryId: selectedCategoryId,
       name: pkgName.trim(),
+      scriptTitle: pkgScriptTitle.trim() || undefined,
+      subtitle: pkgSubtitle.trim() || undefined,
+      shortCode: editingPackage?.shortCode,
+      badgeText: pkgBadgeText.trim() || undefined,
       basePrice: parseFloat(pkgPrice) || 0,
       baseHours: parseFloat(pkgHours) || 2,
       basePax: parseInt(pkgPax, 10) || 100,
       description: pkgDesc.trim(),
+      specs: editingPackage?.specs,
       inclusions: pkgInclusions
+        .split('\n')
+        .map((s) => s.trim())
+        .filter(Boolean),
+      freebies: pkgFreebies
         .split('\n')
         .map((s) => s.trim())
         .filter(Boolean),
       isActive: true,
     };
-    savePackage(newPkg);
+    await savePackage(newPkg);
     setShowPackageModal(false);
     refreshData();
     setSelectedPackageId(newPkg.id);
   };
 
-  const handleDeletePackage = (id: string, name: string) => {
+  const handleDeletePackage = async (id: string, name: string) => {
     if (confirm(`Delete package "${name}"?`)) {
-      deletePackage(id);
+      await deletePackage(id);
       refreshData();
     }
   };
@@ -238,7 +317,7 @@ export default function CatalogPage() {
     setAddonVariants(addonVariants.filter((v) => v.id !== id));
   };
 
-  const handleSaveAddon = (e: React.FormEvent) => {
+  const handleSaveAddon = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!addonName.trim() || !selectedPackageId) return;
 
@@ -250,21 +329,90 @@ export default function CatalogPage() {
       pricingType: addonPricingType,
       basePrice: parseFloat(addonBasePrice) || 0,
       intervalUnit: addonPricingType === 'interval' ? addonIntervalUnit : undefined,
-      intervalStep: addonPricingType === 'interval' ? parseInt(addonIntervalStep, 10) || 1 : undefined,
+      intervalStep:
+        addonPricingType === 'interval' ? parseInt(addonIntervalStep, 10) || 1 : undefined,
       defaultQuantity: parseInt(addonDefaultQty, 10) || 1,
       variants: addonPricingType === 'variant' ? addonVariants : undefined,
       description: addonDesc.trim(),
       isActive: true,
     };
 
-    saveAddon(newAddon);
+    await saveAddon(newAddon);
     setShowAddonModal(false);
     refreshData();
   };
 
-  const handleDeleteAddon = (id: string, name: string) => {
+  const handleDeleteAddon = async (id: string, name: string) => {
     if (confirm(`Delete add-on "${name}"?`)) {
-      deleteAddon(id);
+      await deleteAddon(id);
+      refreshData();
+    }
+  };
+
+  // Location Zone handlers
+  const handleOpenZoneModal = (zone?: LocationZone) => {
+    if (zone) {
+      setEditingZone(zone);
+      setZoneName(zone.name);
+      setZoneFee(zone.defaultFee.toString());
+      setZoneDesc(zone.description || '');
+    } else {
+      setEditingZone(null);
+      setZoneName('');
+      setZoneFee('0');
+      setZoneDesc('');
+    }
+    setShowZoneModal(true);
+  };
+
+  const handleSaveZone = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!zoneName.trim()) return;
+    const z: LocationZone = {
+      id: editingZone ? editingZone.id : `zone-${Date.now()}`,
+      name: zoneName.trim(),
+      defaultFee: parseFloat(zoneFee) || 0,
+      description: zoneDesc.trim(),
+    };
+    await saveZone(z);
+    setShowZoneModal(false);
+    refreshData();
+  };
+
+  const handleDeleteZone = async (id: string, name: string) => {
+    if (confirm(`Delete location zone "${name}"?`)) {
+      await deleteZone(id);
+      refreshData();
+    }
+  };
+
+  // Event Type handlers
+  const handleOpenEventTypeModal = (evType?: string) => {
+    if (evType) {
+      setEditingEventType(evType);
+      setEventTypeName(evType);
+    } else {
+      setEditingEventType(null);
+      setEventTypeName('');
+    }
+    setShowEventTypeModal(true);
+  };
+
+  const handleSaveEventType = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!eventTypeName.trim()) return;
+    if (editingEventType) {
+      updateEventType(editingEventType, eventTypeName.trim());
+    } else {
+      saveEventType(eventTypeName.trim());
+    }
+    setShowEventTypeModal(false);
+    refreshData();
+  };
+
+  const handleDeleteEventType = (evType: string) => {
+    if (confirm(`Delete event type "${evType}"?`)) {
+      deleteEventType(evType);
       refreshData();
     }
   };
@@ -591,6 +739,123 @@ export default function CatalogPage() {
         </div>
       </div>
 
+      {/* ================= DROPDOWNS & MOBILIZATION ZONES MANAGEMENT ================= */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
+        {/* Location Zones & Mobilization Fees */}
+        <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-5 flex flex-col">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div>
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                <MapPin className="w-3.5 h-3.5 text-teal-700" />
+                4. Location Zones & Mobilization Fees
+              </span>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Manage location dropdown options and default out-of-town mobilization rates.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => handleOpenZoneModal()}
+              className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg bg-teal-50 text-teal-700 hover:bg-teal-100 font-medium cursor-pointer"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              Add Zone
+            </button>
+          </div>
+
+          <div className="space-y-2 mt-3 max-h-72 overflow-y-auto pr-1">
+            {zones.map((z) => (
+              <div
+                key={z.id}
+                className="flex items-center justify-between p-3 rounded-xl border border-slate-200 hover:border-slate-300 bg-slate-50/50 transition-all"
+              >
+                <div className="min-w-0 pr-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-semibold text-slate-900 truncate">{z.name}</span>
+                    <span className="text-[11px] font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200">
+                      ₱{z.defaultFee.toLocaleString()}
+                    </span>
+                  </div>
+                  {z.description && (
+                    <p className="text-[11px] text-slate-500 truncate mt-0.5">{z.description}</p>
+                  )}
+                </div>
+                <div className="flex items-center gap-1 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => handleOpenZoneModal(z)}
+                    className="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-200/60 cursor-pointer"
+                    title="Edit Zone"
+                  >
+                    <Edit2 className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteZone(z.id, z.name)}
+                    className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 cursor-pointer"
+                    title="Delete Zone"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Event Types Dropdown Options */}
+        <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-5 flex flex-col">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div>
+              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                <Calendar className="w-3.5 h-3.5 text-teal-700" />
+                5. Event Types Dropdown
+              </span>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Customize event categories selectable on the Proposal Calculator.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => handleOpenEventTypeModal()}
+              className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg bg-teal-50 text-teal-700 hover:bg-teal-100 font-medium cursor-pointer"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              Add Event Type
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3 max-h-72 overflow-y-auto pr-1">
+            {eventTypes.map((ev) => (
+              <div
+                key={ev}
+                className="flex items-center justify-between p-2.5 rounded-xl border border-slate-200 hover:border-slate-300 bg-slate-50/50 transition-all"
+              >
+                <span className="text-xs font-semibold text-slate-800 truncate pr-2">{ev}</span>
+                <div className="flex items-center gap-1 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => handleOpenEventTypeModal(ev)}
+                    className="p-1 text-slate-400 hover:text-slate-700 rounded hover:bg-slate-200/60 cursor-pointer"
+                    title="Edit Event Type"
+                  >
+                    <Edit2 className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteEventType(ev)}
+                    className="p-1 text-slate-400 hover:text-rose-600 rounded hover:bg-rose-50 cursor-pointer"
+                    title="Delete Event Type"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* Category Modal */}
       {showCategoryModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
@@ -646,12 +911,12 @@ export default function CatalogPage() {
 
       {/* Package Modal */}
       {showPackageModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 overflow-y-auto">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl my-8">
             <h3 className="text-lg font-bold text-slate-900">
               {editingPackage ? 'Edit Package' : 'Create Package'}
             </h3>
-            <form onSubmit={handleSavePackage} className="mt-4 space-y-4">
+            <form onSubmit={handleSavePackage} className="mt-4 space-y-3.5">
               <div>
                 <label className="block text-xs font-semibold text-slate-700 uppercase">
                   Package Name
@@ -659,11 +924,50 @@ export default function CatalogPage() {
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Premium Photobooth, Wedding Coverage"
+                  placeholder="e.g. Premium Photobooth, Sinta Wedding Day Coverage"
                   value={pkgName}
                   onChange={(e) => setPkgName(e.target.value)}
                   className="mt-1 w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-teal-600"
                 />
+              </div>
+
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 uppercase">
+                    Script Title (Canva)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Sinta, Classic"
+                    value={pkgScriptTitle}
+                    onChange={(e) => setPkgScriptTitle(e.target.value)}
+                    className="mt-1 w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-teal-600"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 uppercase">
+                    Subtitle
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Wedding Day Coverage"
+                    value={pkgSubtitle}
+                    onChange={(e) => setPkgSubtitle(e.target.value)}
+                    className="mt-1 w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-teal-600"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 uppercase">
+                    Promo Badge
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. 15% OFF"
+                    value={pkgBadgeText}
+                    onChange={(e) => setPkgBadgeText(e.target.value)}
+                    className="mt-1 w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-teal-600"
+                  />
+                </div>
               </div>
 
               <div className="grid grid-cols-3 gap-3">
@@ -717,17 +1021,31 @@ export default function CatalogPage() {
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 uppercase">
-                  Inclusions (One per line)
-                </label>
-                <textarea
-                  rows={4}
-                  placeholder="2 Hours Unlimited Prints&#10;Custom Print Layout&#10;On-site Attendant"
-                  value={pkgInclusions}
-                  onChange={(e) => setPkgInclusions(e.target.value)}
-                  className="mt-1 w-full px-3 py-2 text-sm font-mono text-xs border border-slate-300 rounded-lg focus:outline-teal-600"
-                />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 uppercase">
+                    Inclusions (One per line)
+                  </label>
+                  <textarea
+                    rows={4}
+                    placeholder="2 Hours Unlimited Prints&#10;Custom Print Layout&#10;On-site Attendant"
+                    value={pkgInclusions}
+                    onChange={(e) => setPkgInclusions(e.target.value)}
+                    className="mt-1 w-full px-3 py-2 font-mono text-xs border border-slate-300 rounded-lg focus:outline-teal-600"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 uppercase">
+                    Freebies (One per line)
+                  </label>
+                  <textarea
+                    rows={4}
+                    placeholder="Magnetic Photo Frame&#10;Online Gallery Access"
+                    value={pkgFreebies}
+                    onChange={(e) => setPkgFreebies(e.target.value)}
+                    className="mt-1 w-full px-3 py-2 font-mono text-xs border border-slate-300 rounded-lg focus:outline-teal-600"
+                  />
+                </div>
               </div>
 
               <div className="flex justify-end gap-2 pt-2">
@@ -1022,6 +1340,113 @@ export default function CatalogPage() {
                   className="px-4 py-2 text-sm bg-teal-700 hover:bg-teal-800 text-white rounded-lg font-medium"
                 >
                   Save Add-On
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Location Zone Modal */}
+      {showZoneModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
+            <h3 className="text-lg font-bold text-slate-900">
+              {editingZone ? 'Edit Location Zone' : 'Add Location Zone'}
+            </h3>
+            <form onSubmit={handleSaveZone} className="mt-4 space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 uppercase">
+                  Zone / Region Name
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Subic / Zambales / Bataan"
+                  value={zoneName}
+                  onChange={(e) => setZoneName(e.target.value)}
+                  className="mt-1 w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-teal-600"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 uppercase">
+                  Default Mobilization Fee (₱)
+                </label>
+                <input
+                  type="number"
+                  required
+                  min={0}
+                  value={zoneFee}
+                  onChange={(e) => setZoneFee(e.target.value)}
+                  className="mt-1 w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-teal-600"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 uppercase">
+                  Description / Notes
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. Northern Luzon Zone"
+                  value={zoneDesc}
+                  onChange={(e) => setZoneDesc(e.target.value)}
+                  className="mt-1 w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-teal-600"
+                />
+              </div>
+              <div className="flex justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowZoneModal(false)}
+                  className="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 text-sm bg-teal-700 hover:bg-teal-800 text-white rounded-lg font-medium"
+                >
+                  Save Zone
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Event Type Modal */}
+      {showEventTypeModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
+            <h3 className="text-lg font-bold text-slate-900">
+              {editingEventType ? 'Edit Event Type' : 'Add Event Type'}
+            </h3>
+            <form onSubmit={handleSaveEventType} className="mt-4 space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 uppercase">
+                  Event Type Label
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Wedding, Debut, Corporate Gala"
+                  value={eventTypeName}
+                  onChange={(e) => setEventTypeName(e.target.value)}
+                  className="mt-1 w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-teal-600"
+                />
+              </div>
+              <div className="flex justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowEventTypeModal(false)}
+                  className="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-lg"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 text-sm bg-teal-700 hover:bg-teal-800 text-white rounded-lg font-medium"
+                >
+                  Save Event Type
                 </button>
               </div>
             </form>

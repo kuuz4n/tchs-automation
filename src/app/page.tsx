@@ -30,10 +30,12 @@ import {
   syncZonesFromCloud,
   getEventTypes,
   getProposals,
+  syncProposalsFromCloud,
   saveProposal,
   getCurrentUser,
   convertProposalToInvoice,
   generateAutomatedInvoiceNumber,
+  generateUUID,
 } from '@/lib/storage';
 import { getAuthSession } from '@/lib/auth';
 import {
@@ -166,14 +168,16 @@ export default function CalculatorPage() {
 
     // Sync with Supabase cloud
     try {
-      const [cloudPkgs, cloudAdds, cloudZns] = await Promise.all([
+      const [cloudPkgs, cloudAdds, cloudZns, cloudProps] = await Promise.all([
         syncPackagesFromCloud(),
         syncAddonsFromCloud(),
         syncZonesFromCloud(),
+        syncProposalsFromCloud(),
       ]);
       setPackages(cloudPkgs);
       setAddons(cloudAdds);
       setZones(cloudZns);
+      setSavedProposals(cloudProps);
     } catch (e) {
       console.warn('Cloud sync error:', e);
     }
@@ -336,6 +340,19 @@ export default function CalculatorPage() {
     }
   };
 
+  const handleUpdateAddonVariant = (
+    serviceIndex: number,
+    addonId: string,
+    variantId: string
+  ) => {
+    const updated = [...services];
+    const config = updated[serviceIndex].selectedAddonConfigs.find((c) => c.addonId === addonId);
+    if (config) {
+      config.variantId = variantId;
+      setServices(updated);
+    }
+  };
+
   // Discount Management
   const handleToggleDiscount = (id: string) => {
     setDiscountOptions((prev) =>
@@ -431,7 +448,7 @@ export default function CalculatorPage() {
     const session = getAuthSession();
     const user = session?.user || currentUser || getCurrentUser();
     return {
-      id: `prop-${Date.now()}`,
+      id: generateUUID(),
       proposalNumber: invoiceNumber || generateAutomatedInvoiceNumber(),
       client: {
         name: clientName || 'Client Name',
@@ -803,28 +820,68 @@ export default function CalculatorPage() {
 
                               {/* Quantity & Variant Selector */}
                               {isSelected && activeConfig && (
-                                <div className="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
-                                  <span className="text-[11px] text-slate-500">Units / Qty:</span>
-                                  <div className="flex items-center gap-2">
-                                    <input
-                                      type="number"
-                                      min={1}
-                                      value={activeConfig.quantity}
-                                      onChange={(e) =>
-                                        handleUpdateAddonQty(
-                                          sIndex,
-                                          addon.id,
-                                          parseInt(e.target.value, 10) || 1
-                                        )
-                                      }
-                                      className="w-16 px-2 py-0.5 text-xs border border-slate-300 rounded text-center"
-                                    />
-                                    <span className="text-[11px] font-semibold text-slate-700">
-                                      = ₱
-                                      {(
-                                        (addon.basePrice || 0) * (activeConfig.quantity || 1)
-                                      ).toLocaleString()}
-                                    </span>
+                                <div className="mt-2 pt-2 border-t border-slate-100 space-y-2">
+                                  {addon.pricingType === 'variant' &&
+                                    addon.variants &&
+                                    addon.variants.length > 0 && (
+                                      <div className="flex items-center justify-between gap-2">
+                                        <span className="text-[11px] text-slate-500">Option:</span>
+                                        <select
+                                          value={
+                                            activeConfig.variantId || addon.variants[0]?.id || ''
+                                          }
+                                          onChange={(e) =>
+                                            handleUpdateAddonVariant(
+                                              sIndex,
+                                              addon.id,
+                                              e.target.value
+                                            )
+                                          }
+                                          className="flex-1 px-2 py-1 text-xs border border-slate-300 rounded bg-slate-50 font-medium text-slate-800"
+                                        >
+                                          {addon.variants.map((v) => (
+                                            <option key={v.id} value={v.id}>
+                                              {v.name} (+₱{v.priceDelta.toLocaleString()})
+                                            </option>
+                                          ))}
+                                        </select>
+                                      </div>
+                                    )}
+
+                                  <div className="flex items-center justify-between gap-2">
+                                    <span className="text-[11px] text-slate-500">Units / Qty:</span>
+                                    <div className="flex items-center gap-2">
+                                      <input
+                                        type="number"
+                                        min={1}
+                                        value={activeConfig.quantity}
+                                        onChange={(e) =>
+                                          handleUpdateAddonQty(
+                                            sIndex,
+                                            addon.id,
+                                            parseInt(e.target.value, 10) || 1
+                                          )
+                                        }
+                                        className="w-16 px-2 py-0.5 text-xs border border-slate-300 rounded text-center"
+                                      />
+                                      <span className="text-[11px] font-semibold text-slate-700">
+                                        = ₱
+                                        {(() => {
+                                          const activeVar =
+                                            addon.pricingType === 'variant'
+                                              ? addon.variants?.find(
+                                                  (v) => v.id === activeConfig.variantId
+                                                ) || addon.variants?.[0]
+                                              : null;
+                                          const unitRate = activeVar
+                                            ? activeVar.priceDelta
+                                            : addon.basePrice || 0;
+                                          return (
+                                            unitRate * (activeConfig.quantity || 1)
+                                          ).toLocaleString();
+                                        })()}
+                                      </span>
+                                    </div>
                                   </div>
                                 </div>
                               )}

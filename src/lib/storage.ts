@@ -313,6 +313,17 @@ export async function deleteZone(id: string): Promise<void> {
   }
 }
 
+export function generateUUID(): string {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
+
 // ==========================================
 // 5. EVENT TYPES (Dropdown Management)
 // ==========================================
@@ -330,6 +341,13 @@ export function saveEventType(type: string): void {
   }
 }
 
+export function updateEventType(oldType: string, newType: string): void {
+  const clean = newType.trim();
+  if (!clean) return;
+  const current = getEventTypes().map((t) => (t === oldType ? clean : t));
+  setItem(STORAGE_KEYS.EVENT_TYPES, Array.from(new Set(current)));
+}
+
 export function deleteEventType(type: string): void {
   const current = getEventTypes().filter((t) => t !== type);
   setItem(STORAGE_KEYS.EVENT_TYPES, current);
@@ -340,6 +358,36 @@ export function deleteEventType(type: string): void {
 // ==========================================
 export function getProposals(): Proposal[] {
   return getItem<Proposal[]>(STORAGE_KEYS.PROPOSALS, INITIAL_PROPOSALS);
+}
+
+export async function syncProposalsFromCloud(): Promise<Proposal[]> {
+  if (isSupabaseConfigured && supabase) {
+    const { data, error } = await supabase
+      .from('proposals')
+      .select('*')
+      .order('created_at', { ascending: false });
+    if (!error && data && data.length > 0) {
+      const formatted: Proposal[] = data.map((d: any) => ({
+        id: d.id,
+        proposalNumber: d.proposal_number,
+        client: d.client || {},
+        createdById: d.created_by || 'user-maria',
+        createdBy: getUsers().find((u) => u.id === d.created_by) || getCurrentUser(),
+        services: d.services || [],
+        discounts: d.discounts || [],
+        mobilization: d.mobilization || { zoneName: 'Metro Manila', fee: 0 },
+        pricing: d.pricing || {},
+        packageTierBadge: d.package_tier_badge || 'PACKAGE A',
+        status: d.status || 'draft',
+        notes: d.notes || '',
+        createdAt: d.created_at || new Date().toISOString(),
+        updatedAt: d.updated_at || new Date().toISOString(),
+      }));
+      setItem(STORAGE_KEYS.PROPOSALS, formatted);
+      return formatted;
+    }
+  }
+  return getProposals();
 }
 
 export async function saveProposal(proposal: Proposal): Promise<void> {
@@ -376,6 +424,45 @@ export async function deleteProposal(id: string): Promise<void> {
 
 export function getInvoices(): Invoice[] {
   return getItem<Invoice[]>(STORAGE_KEYS.INVOICES, []);
+}
+
+export async function syncInvoicesFromCloud(): Promise<Invoice[]> {
+  if (isSupabaseConfigured && supabase) {
+    const { data, error } = await supabase
+      .from('invoices')
+      .select('*')
+      .order('created_at', { ascending: false });
+    if (!error && data && data.length > 0) {
+      const formatted: Invoice[] = data.map((d: any) => ({
+        id: d.id,
+        invoiceNumber: d.invoice_number,
+        proposalId: d.proposal_id || '',
+        proposalNumber: d.proposal_number || '',
+        client: d.client || {},
+        issueDate: d.issue_date || new Date().toISOString().split('T')[0],
+        dueDate: d.due_date || new Date().toISOString().split('T')[0],
+        services: d.services || [],
+        discounts: d.discounts || [],
+        mobilization: d.mobilization || { zoneName: 'Metro Manila', fee: 0 },
+        pricing: d.pricing || {},
+        packageTierBadge: d.package_tier_badge || 'PACKAGE A',
+        paymentStatus: d.payment_status || 'unpaid',
+        paidAmount: parseFloat(d.paid_amount) || 0,
+        balanceDue: parseFloat(d.balance_due) || 0,
+        issuedBy: getUsers().find((u) => u.id === d.issued_by) || getCurrentUser(),
+        signerName: d.signer_name || 'Staff Member',
+        signerTitle: d.signer_title || '',
+        signerEmail: d.signer_email || '',
+        signerPhone: d.signer_phone || '',
+        signerSignatureUrl: d.signer_signature_url || '',
+        notes: d.notes || '',
+        createdAt: d.created_at || new Date().toISOString(),
+      }));
+      setItem(STORAGE_KEYS.INVOICES, formatted);
+      return formatted;
+    }
+  }
+  return getInvoices();
 }
 
 export async function saveInvoice(invoice: Invoice): Promise<void> {
@@ -426,12 +513,48 @@ export function getUsers(): UserProfile[] {
   return getItem<UserProfile[]>(STORAGE_KEYS.USERS, INITIAL_USERS);
 }
 
-export function saveUser(user: UserProfile): void {
+export async function syncUsersFromCloud(): Promise<UserProfile[]> {
+  if (isSupabaseConfigured && supabase) {
+    const { data, error } = await supabase.from('profiles').select('*');
+    if (!error && data && data.length > 0) {
+      const formatted: UserProfile[] = data.map((d: any) => ({
+        id: d.id,
+        email: d.email,
+        fullName: d.full_name,
+        role: d.role === 'admin' ? 'admin' : 'sales_rep',
+        jobTitle: d.job_title || 'Event Specialist',
+        phone: d.phone || '',
+        signatureImageUrl: d.signature_image_url || '',
+        emailSignatureHtml: d.email_signature_html || '',
+        companyBranch: d.company_branch || '',
+      }));
+      setItem(STORAGE_KEYS.USERS, formatted);
+      return formatted;
+    }
+  }
+  return getUsers();
+}
+
+export async function saveUser(user: UserProfile): Promise<void> {
   const current = getUsers();
   const index = current.findIndex((u) => u.id === user.id);
   if (index >= 0) current[index] = user;
   else current.push(user);
   setItem(STORAGE_KEYS.USERS, current);
+
+  if (isSupabaseConfigured && supabase && user.id && !user.id.startsWith('user-')) {
+    await supabase.from('profiles').upsert({
+      id: user.id,
+      email: user.email,
+      full_name: user.fullName,
+      role: user.role,
+      job_title: user.jobTitle,
+      phone: user.phone,
+      signature_image_url: user.signatureImageUrl,
+      email_signature_html: user.emailSignatureHtml,
+      company_branch: user.companyBranch,
+    });
+  }
 }
 
 export function getCurrentUser(): UserProfile {
@@ -475,7 +598,7 @@ export function convertProposalToInvoice(proposal: Proposal, currentUser: UserPr
   dueDate.setDate(dueDate.getDate() + 7);
 
   const invoice: Invoice = {
-    id: `inv-${Date.now()}`,
+    id: generateUUID(),
     invoiceNumber: proposal.proposalNumber.startsWith('TCHS')
       ? proposal.proposalNumber
       : generateAutomatedInvoiceNumber(),
